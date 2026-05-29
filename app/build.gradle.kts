@@ -52,6 +52,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.compose.material.icons.extended) // 图标库
     implementation(libs.androidx.navigation.compose) // 让指定页面才显示导航栏
+    implementation(libs.androidx.datastore.preferences) // 读取配置文件
     testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
