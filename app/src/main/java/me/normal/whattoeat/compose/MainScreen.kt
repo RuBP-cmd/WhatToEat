@@ -1,6 +1,7 @@
 package me.normal.whattoeat.compose
 
 
+import android.R.attr.data
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -22,9 +23,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hasRoute
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -54,24 +57,26 @@ fun MainScreen(){
 
     Scaffold(
         modifier = Modifier,
-        topBar = {
-            CenterAlignedTopAppBar(title = { Text("WhatToEat v1.0") })
-        },
         bottomBar = { MainScreenNav(navController) }
     ){ paddingValues ->
         Box(
             Modifier.padding(paddingValues)
         ){
             NavHost(navController, Home){
-                composable<Home>{ HomeScreen{ navController.navigate(Eat) } }
+                composable<Home>{ HomeScreen{ navController.navigate(Eat)} } // Home -> Eat
                 composable<Settings>{ SettingsScreen() }
-                composable<Eat>{ EatScreen() }
-                composable<FoodEdit>{ FoodEditScreen() }
+                composable<Eat>{ EatScreen( // Home <- Eat -> FoodEdit
+                    onNavigateToFoodEdit = { navController.navigate(FoodEdit) },
+                    onReturnToHome = { navController.popBackStack() }
+                ) }
+                composable<FoodEdit>{ FoodEditScreen{ navController.popBackStack()} } // Eat <- FoodEdit
             }
         }
     }
 
 }
+
+
 
 @Composable
 fun MainScreenNav(
@@ -85,45 +90,42 @@ fun MainScreenNav(
     val isVisible = selectedHome || selectedSettings
 
     if(isVisible){ // 用于展示或者隐藏导航栏
+        data class Item(
+            val label: String,
+            val selected: Boolean,
+            val FilledVector: ImageVector,
+            val OutlinedVector: ImageVector,
+            val route: Any
+        )
+
+        val itemList = listOf(
+            Item("首页", selectedHome, Icons.Filled.Home, Icons.Outlined.Home, Home),
+            Item("设置", selectedSettings, Icons.Filled.Settings, Icons.Outlined.Settings, Settings)
+        )
+
         NavigationBar() {
-            NavigationBarItem(
-                selected = selectedHome,
-                onClick = {
-                    navController.navigate(Home){
-                        popUpTo(navController.graph.startDestinationId){
-                            saveState = true
+            for (item in itemList){
+                NavigationBarItem(
+                    selected = item.selected,
+                    onClick = {
+                        navController.navigate(item.route){
+                            popUpTo(navController.graph.findStartDestination().id){
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
                         }
-                        launchSingleTop = true // 顶部页面不重复入栈
-                        restoreState = true // 恢复保存的状态
+                    },
+                    label = { Text(item.label) },
+                    icon = {
+                        Icon(
+                            imageVector = if(item.selected) item.FilledVector else item.OutlinedVector,
+                            contentDescription = null
+                        )
                     }
-                          }, // 按钮按下后将selectedIndex更新
-                label = { Text("首页") },         // 然后便会自动切换页面和导航栏重绘
-                icon = {
-                    Icon(
-                        imageVector = if(selectedHome)  Icons.Filled.Home else Icons.Outlined.Home, // 选中时变为实心，否则空心
-                        contentDescription = null // 由于已经有了label，就不需要描述图片了，防止重复播报
-                    )
-                }
-            )
-            NavigationBarItem(
-                selected = selectedSettings,
-                onClick = {
-                    navController.navigate(Settings){
-                        popUpTo(navController.graph.startDestinationId){
-                            saveState = true
-                        }
-                        launchSingleTop = true // 顶部页面不重复入栈
-                        restoreState = true // 恢复保存的状态
-                    } // 改页面
-                          },
-                label = { Text("设置") },
-                icon = {
-                    Icon(
-                        imageVector = if(selectedSettings) Icons.Filled.Settings else Icons.Outlined.Settings,
-                        contentDescription = null
-                    )
-                }
-            )
+                )
+            }
+
         }
     }
 

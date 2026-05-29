@@ -3,15 +3,23 @@ package me.normal.whattoeat.compose.home
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material3.Card
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -22,12 +30,17 @@ import me.normal.whattoeat.ui.components.PrimaryButton
 
 
 @Composable
-fun HomeScreen(onNavigateToEat: () -> Unit){
+fun HomeScreen(
+    onNavigateToEat: () -> Unit
+){
+
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ){
+        Text("", modifier = Modifier.padding(10.dp))
+
         MobaMessageCard()
         PrimaryButton("Moba") { onNavigateToEat() }
 
@@ -41,6 +54,7 @@ fun HomeScreen(onNavigateToEat: () -> Unit){
             InfoCardButton("其他"){}
         }
     }
+
 }
 
 @Composable
@@ -67,6 +81,6 @@ private fun MobaMessageCard(){
 
 @Preview
 @Composable
-fun HomeScreenPreview(){
-    HomeScreen {  }
+private fun HomeScreenPreview(){
+    HomeScreen{}
 }
