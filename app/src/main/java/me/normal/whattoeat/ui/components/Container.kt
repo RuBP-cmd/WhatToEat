@@ -55,9 +55,12 @@ fun ListCard(
 }
 
 @Composable
-fun RowItem(cells :List<Cell>){
+fun RowItem(
+    modifier: Modifier = Modifier,
+    cells :List<Cell>
+){
     Row(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 10.dp, horizontal = 5.dp),
+        modifier = modifier.fillMaxWidth().padding(vertical = 10.dp, horizontal = 5.dp),
         verticalAlignment = Alignment.CenterVertically
     ){
         for(cell in cells) {

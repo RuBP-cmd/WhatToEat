@@ -41,6 +41,7 @@ fun TopBar(
         title?.let{
             Text(
                 text = it,
+                color = MaterialTheme.colorScheme.onPrimary,
                 style = MaterialTheme.typography.titleLarge
             )
         }

@@ -14,10 +14,9 @@ interface FoodDao {
     fun getAll(): Flow<List<Food>>
 
     @Update
-    fun update(food: Food)
+    suspend fun update(food: Food)
     @Insert
-    fun insert(food: Food)
-
+    suspend fun insert(food: Food)
     @Delete
-    fun delete(food: Food)
+    suspend fun delete(food: Food)
 }
