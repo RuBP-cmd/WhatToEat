@@ -1,6 +1,5 @@
 package me.normal.whattoeat.ui.viewmodel
 
-
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.SharingStarted
@@ -39,7 +38,7 @@ class FoodViewModel (
     }
 
     fun choosenRandomFood(): String{
-        var foodList = foods.value
+        val foodList = foods.value.filter{ food -> food.marked }
 
         if(foodList.isEmpty()) return "列表为空！"
 

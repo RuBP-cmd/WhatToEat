@@ -8,7 +8,6 @@ class FoodRepository(
     private val dao: FoodDao
 ) {
 
-
     fun getAll(): Flow<List<Food>> {
         return dao.getAll()
     }

@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -15,6 +14,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircleOutline
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -22,6 +22,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -30,6 +31,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -135,7 +137,12 @@ private fun EditTable(
     val bodyColor = MaterialTheme.colorScheme.secondary
     val titleStyle = MaterialTheme.typography.titleMedium
     val textStyle = MaterialTheme.typography.bodyMedium
-    val horizontalPaddingValues = 20.dp
+    val horizontalPaddingValues = 5.dp
+    val textFieldColors = TextFieldDefaults.colors(
+        focusedContainerColor = Color.Transparent,
+        unfocusedContainerColor = Color.Transparent,
+        disabledContainerColor = Color.Transparent
+    )
 
     LazyColumn(
         modifier = Modifier.fillMaxSize().background(color = bodyColor),
@@ -159,8 +166,8 @@ private fun EditTable(
                         content = {
                             AppIconButton({ onClickStar(food) }) {
                                 Icon(
-                                    imageVector = if(food.marked) Icons.Filled.Star else Icons.Outlined.Star,
-                                    contentDescription = null
+                                    imageVector = if(food.marked) Icons.Filled.Star else Icons.Outlined.Home,
+                                    contentDescription = "参选"
                                 )
                             }
                         },
@@ -170,6 +177,7 @@ private fun EditTable(
                         content = { TextField(
                             value = food.name,
                             textStyle = textStyle,
+                            colors = textFieldColors,
                             onValueChange = { name -> onInputName(food, name) }
                         ) },
                         weight = weightList[1]
@@ -178,6 +186,7 @@ private fun EditTable(
                         content = { TextField(
                             value = food.weight.toString(),
                             textStyle = textStyle,
+                            colors = textFieldColors,
                             onValueChange = { weightStr ->
                                 if(weightStr.length in 1..10){
                                     isError = false
