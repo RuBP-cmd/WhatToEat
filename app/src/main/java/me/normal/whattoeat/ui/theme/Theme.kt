@@ -6,6 +6,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
 
 private val PurpleDarkScheme = darkColorScheme(
     primary = Purple80,
@@ -15,31 +17,31 @@ private val PurpleDarkScheme = darkColorScheme(
 
 private val PurpleLightScheme = lightColorScheme(
     primary = Purple40,
-    secondary = PurpleGrey40,
+    secondary = lerp(Purple40, Color.White, 0.8f),
     tertiary = Pink40
 )
 
 private val BlueLightScheme = lightColorScheme(
     primary = BluePrimary,
-    secondary = NeutralSecondary,
+    secondary = lerp(BluePrimary, Color.White, 0.8f),
     tertiary = NeutralTertiary
 )
 
 private val YellowLightScheme = lightColorScheme(
     primary = YellowPrimary,
-    secondary = NeutralSecondary,
+    secondary = lerp(YellowPrimary, Color.White, 0.8f),
     tertiary = NeutralTertiary
 )
 
 private val GreenLightScheme = lightColorScheme(
     primary = GreenPrimary,
-    secondary = NeutralSecondary,
+    secondary = lerp(GreenPrimary, Color.White, 0.8f),
     tertiary = NeutralTertiary
 )
 
 private val PinkLightScheme = lightColorScheme(
     primary = PinkPrimary,
-    secondary = NeutralSecondary,
+    secondary = lerp(PinkPrimary, Color.White, 0.8f),
     tertiary = NeutralTertiary
 )
 

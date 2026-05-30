@@ -1,4 +1,4 @@
-package me.normal.whattoeat.compose
+package me.normal.whattoeat.ui.screens
 
 
 import androidx.compose.foundation.layout.Box
@@ -18,10 +18,15 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -30,10 +35,13 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import kotlinx.serialization.Serializable
-import me.normal.whattoeat.compose.home.HomeScreen
-import me.normal.whattoeat.compose.misc.EatScreen
-import me.normal.whattoeat.compose.misc.FoodEditScreen
-import me.normal.whattoeat.compose.settings.SettingsScreen
+import me.normal.whattoeat.data.local.database.AppDatabase
+import me.normal.whattoeat.data.repository.FoodRepository
+import me.normal.whattoeat.ui.screens.home.HomeScreen
+import me.normal.whattoeat.ui.screens.misc.EatScreen
+import me.normal.whattoeat.ui.screens.misc.FoodEditScreen
+import me.normal.whattoeat.ui.screens.settings.SettingsScreen
+import me.normal.whattoeat.ui.viewmodel.FoodViewModel
 
 @Serializable
 object Home
@@ -50,7 +58,16 @@ object Eat
 @Composable
 fun MainScreen(){
     val navController = rememberNavController();
+    val context = LocalContext.current
 
+    val foodViewModel: FoodViewModel = viewModel(
+        factory = viewModelFactory {
+            initializer {
+                // 直接在这里组装你的 ViewModel
+                FoodViewModel(FoodRepository(AppDatabase.getInstance(context).foodDao()))
+            }
+        }
+    )
 
     Scaffold(
         modifier = Modifier,
@@ -63,10 +80,14 @@ fun MainScreen(){
                 composable<Home>{ HomeScreen{ navController.navigate(Eat)} } // Home -> Eat
                 composable<Settings>{ SettingsScreen() }
                 composable<Eat>{ EatScreen( // Home <- Eat -> FoodEdit
+                    foodViewModel = foodViewModel,
                     onNavigateToFoodEdit = { navController.navigate(FoodEdit) },
                     onReturnToHome = { navController.popBackStack() }
                 ) }
-                composable<FoodEdit>{ FoodEditScreen{ navController.popBackStack()} } // Eat <- FoodEdit
+                composable<FoodEdit>{ FoodEditScreen(
+                    foodViewModel = foodViewModel,
+                    onReturnToEat = { navController.popBackStack()}
+                ) } // Eat <- FoodEdit
             }
         }
     }

@@ -6,7 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import me.normal.whattoeat.compose.MainScreen
+import me.normal.whattoeat.ui.screens.MainScreen
 import me.normal.whattoeat.data.local.config.Config
 import me.normal.whattoeat.ui.theme.ColorTheme
 import me.normal.whattoeat.ui.theme.WhatToEatTheme

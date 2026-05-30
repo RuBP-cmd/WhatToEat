@@ -1,5 +1,6 @@
-package me.normal.whattoeat.compose.settings
+package me.normal.whattoeat.ui.screens.settings
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -42,6 +43,7 @@ fun SettingsScreen(){
             modifier = Modifier.width(300.dp)
         ){
             Column(
+                modifier = Modifier.background(color = MaterialTheme.colorScheme.secondary),
                 horizontalAlignment = Alignment.CenterHorizontally
             ){
                 Box(

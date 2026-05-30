@@ -1,7 +1,11 @@
 package me.normal.whattoeat.ui.components
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronLeft
@@ -13,7 +17,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
@@ -24,10 +27,11 @@ fun TopBar(
     onClickMore: (() -> Unit)? = null
 ){
     Row(
+        modifier = Modifier.fillMaxWidth().background(color = MaterialTheme.colorScheme.primary),
         horizontalArrangement = Arrangement.SpaceBetween, // 左边的放最左，右边的放最右，其余均分排布
         verticalAlignment = Alignment.CenterVertically
     ){
-        IconButton(onClickReturn){
+        AppIconButton(onClickReturn){
             Icon(
                 imageVector = Icons.Filled.ChevronLeft,
                 contentDescription = "返回"
@@ -37,13 +41,18 @@ fun TopBar(
         title?.let{
             Text(
                 text = it,
-                modifier = Modifier.padding(horizontal = 100.dp),
                 style = MaterialTheme.typography.titleLarge
             )
         }
 
-        onClickMore?.let{
-            IconButton(it){
+
+        if(onClickMore == null) {
+            IconButton(
+                onClick = {},
+                enabled = false
+            ) {}
+        } else {
+            AppIconButton(onClickMore){
                 Icon(
                     imageVector = Icons.Filled.MoreVert,
                     contentDescription = "更多"

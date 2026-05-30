@@ -1,4 +1,4 @@
-package me.normal.whattoeat.compose.misc
+package me.normal.whattoeat.ui.screens.misc
 
 import androidx.compose.runtime.Composable
 

@@ -1,4 +1,4 @@
-package me.normal.whattoeat.compose.home
+package me.normal.whattoeat.ui.screens.home
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box

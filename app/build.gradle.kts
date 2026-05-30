@@ -2,7 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
-
+    id("com.google.devtools.ksp")
 }
 
 android {
@@ -42,6 +42,7 @@ android {
 }
 
 dependencies {
+
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material3)
@@ -53,6 +54,9 @@ dependencies {
     implementation(libs.androidx.compose.material.icons.extended) // 图标库
     implementation(libs.androidx.navigation.compose) // 让指定页面才显示导航栏
     implementation(libs.androidx.datastore.preferences) // 读取配置文件
+    implementation(libs.androidx.room.runtime) // 数据库
+    implementation(libs.androidx.room.ktx) // 数据库
+    ksp(libs.androidx.room.compiler) // 数据库
     testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
