@@ -23,7 +23,9 @@ import me.normal.whattoeat.ui.components.PrimaryButton
 
 @Composable
 fun HomeScreen(
-    onNavigateToEat: () -> Unit
+    onNavigateToEat: () -> Unit,
+    onNavigateToPracticalWebsite: () -> Unit,
+    onNavigateToOther: () -> Unit
 ){
 
     Column(
@@ -38,7 +40,7 @@ fun HomeScreen(
             modifier = Modifier.padding(30.dp),
 //            verticalArrangement = Arrangement.spacedBy(10.dp)
         ){
-            val modifier = Modifier.width(190.dp).height(80.dp)
+            val modifier = Modifier.width(200.dp).height(80.dp)
             CardButton(
                 title = "Moba",
                 subtitle = "我们需要开始moba！",
@@ -48,11 +50,11 @@ fun HomeScreen(
                 title = "实用网站",
                 subtitle = "看看有哪些实用网站",
                 modifier = modifier
-            ){}
+            ){ onNavigateToPracticalWebsite() }
             CardButton(
                 title = "其他",
                 modifier = modifier
-            ){}
+            ){ onNavigateToOther() }
         }
     }
 
@@ -83,5 +85,9 @@ private fun MobaMessageCard(){
 @Preview
 @Composable
 private fun HomeScreenPreview(){
-    HomeScreen{}
+    HomeScreen(
+        {},
+        {},
+        {}
+    )
 }

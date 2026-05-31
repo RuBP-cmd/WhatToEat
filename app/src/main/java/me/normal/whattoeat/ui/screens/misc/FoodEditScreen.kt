@@ -186,9 +186,10 @@ private fun EditTable(
         }
 
         // 表内容
-        items(foodList){ food ->
+        items(foodList, key = { it.id }){ food ->
             var isError by remember { mutableStateOf(false) }
-            var foodWeight = food.weight.toString()
+            var foodName by remember(food.id) { mutableStateOf(TextFieldValue(food.name)) }
+            var foodWeight by remember( food.id ) { mutableStateOf(TextFieldValue(food.weight.toString())) } // 根据id来绝对是否重新计算{}中表达式
 
             Box(
                 modifier = Modifier.fillMaxWidth()
@@ -212,11 +213,14 @@ private fun EditTable(
                         ),
                         Cell(
                             content = { TextField(
-                                value = food.name,
+                                value = foodName,
                                 textStyle = textStyle,
                                 colors = textFieldColors,
                                 placeholder = { Text(text = "请输入名称", color = MaterialTheme.colorScheme.onSurfaceVariant) }, // 输入为空的提示信息
-                                onValueChange = { name -> onInputName(food, name) }
+                                onValueChange = { newFoodName ->
+                                    foodName = newFoodName
+                                    onInputName(food, newFoodName.text)
+                                }
                             ) },
                             weight = weightList[1]
                         ),
@@ -226,8 +230,9 @@ private fun EditTable(
                                 textStyle = textStyle,
                                 colors = textFieldColors,
                                 onValueChange = { newFoodWeight ->
-                                    if(newFoodWeight.length in 1..5 && newFoodWeight.all{ it.isDigit()}){
-                                        onInputWeight(food, newFoodWeight.toInt())
+                                    if(newFoodWeight.text.length in 1..5 && newFoodWeight.text.all{ it.isDigit()}){
+                                        foodWeight = newFoodWeight
+                                        onInputWeight(food, newFoodWeight.text.toInt())
                                         isError = false
                                     } else isError = true
                                 },

@@ -40,6 +40,8 @@ import me.normal.whattoeat.data.repository.FoodRepository
 import me.normal.whattoeat.ui.screens.home.HomeScreen
 import me.normal.whattoeat.ui.screens.misc.EatScreen
 import me.normal.whattoeat.ui.screens.misc.FoodEditScreen
+import me.normal.whattoeat.ui.screens.misc.OtherScreen
+import me.normal.whattoeat.ui.screens.misc.PracticalWebsiteScreen
 import me.normal.whattoeat.ui.screens.settings.SettingsScreen
 import me.normal.whattoeat.ui.viewmodel.FoodViewModel
 
@@ -51,6 +53,10 @@ object Settings
 object FoodEdit
 @Serializable
 object Eat
+@Serializable
+object PraticalWebsite
+@Serializable
+object Other
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -77,7 +83,11 @@ fun MainScreen(){
             Modifier.padding(paddingValues)
         ){
             NavHost(navController, Home){
-                composable<Home>{ HomeScreen{ navController.navigate(Eat)} } // Home -> Eat
+                composable<Home>{ HomeScreen(
+                    onNavigateToEat = { navController.navigate(Eat)}, // Home -> Eat
+                    onNavigateToPracticalWebsite = { navController.navigate(PraticalWebsite) }, // Home -> PraticalWebsite
+                    onNavigateToOther = { navController.navigate(Other) }
+                ) }
                 composable<Settings>{ SettingsScreen() }
                 composable<Eat>{ EatScreen( // Home <- Eat -> FoodEdit
                     foodViewModel = foodViewModel,
@@ -88,6 +98,8 @@ fun MainScreen(){
                     foodViewModel = foodViewModel,
                     onReturnToEat = { navController.popBackStack()}
                 ) } // Eat <- FoodEdit
+                composable<PraticalWebsite>{ PracticalWebsiteScreen { navController.popBackStack() } }
+                composable<Other>{ OtherScreen{ navController.popBackStack() } }
             }
         }
     }

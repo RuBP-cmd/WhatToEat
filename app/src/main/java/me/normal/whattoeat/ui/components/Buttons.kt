@@ -168,7 +168,7 @@ fun CardButton(
 
             Icon(
                 imageVector = Icons.Filled.ArrowForward,
-                contentDescription = "点击跳转"
+                contentDescription = "点击跳转",
             )
         }
     }

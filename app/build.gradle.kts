@@ -57,6 +57,8 @@ dependencies {
     implementation(libs.androidx.room.runtime) // 数据库
     implementation(libs.androidx.room.ktx) // 数据库
     ksp(libs.androidx.room.compiler) // 数据库
+    implementation(libs.androidx.material.icons.extended) // 矢量图库扩展
+    implementation(libs.compose)
     testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
