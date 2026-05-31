@@ -3,6 +3,7 @@ package me.normal.whattoeat.ui.screens.home
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -30,19 +31,28 @@ fun HomeScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ){
-        Text("", modifier = Modifier.padding(10.dp))
-
+        Spacer(modifier = Modifier.padding(30.dp))
         MobaMessageCard()
-        PrimaryButton("Moba") { onNavigateToEat() }
 
         Column(
-            modifier = Modifier.padding(50.dp)
+            modifier = Modifier.padding(30.dp),
+//            verticalArrangement = Arrangement.spacedBy(10.dp)
         ){
+            val modifier = Modifier.width(190.dp).height(80.dp)
+            CardButton(
+                title = "Moba",
+                subtitle = "我们需要开始moba！",
+                modifier = modifier
+            ){ onNavigateToEat() }
             CardButton(
                 title = "实用网站",
-                subtitle = "看看有哪些实用网站"
+                subtitle = "看看有哪些实用网站",
+                modifier = modifier
             ){}
-            CardButton("其他"){}
+            CardButton(
+                title = "其他",
+                modifier = modifier
+            ){}
         }
     }
 

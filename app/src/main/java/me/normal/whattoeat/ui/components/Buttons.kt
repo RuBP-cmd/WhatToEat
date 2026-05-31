@@ -2,10 +2,12 @@ package me.normal.whattoeat.ui.components
 
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -69,7 +71,10 @@ fun ElegantButton(
 
     ){
         Box(
-            modifier = Modifier.width(160.dp).height(60.dp).background(brush = gradient),
+            modifier = Modifier
+                .width(160.dp)
+                .height(60.dp)
+                .background(brush = gradient),
             contentAlignment = Alignment.Center
         ){
             Text(
@@ -88,13 +93,43 @@ fun AppIconButton(
     content: (@Composable () -> Unit)
 ){
     IconButton(
-        modifier = modifier.size(48.dp),
+        modifier = modifier.defaultMinSize(48.dp, 48.dp),
         onClick = onClick
     ){
         content()
     }
 }
 
+
+@Composable
+fun CardButton(
+    text: String,
+    modifier: Modifier = Modifier,
+    icon: (@Composable () -> Unit)? = null,
+    onClick: () -> Unit
+){
+    Surface(
+        onClick = onClick,
+        modifier = modifier,
+        shape = RoundedCornerShape(12.dp)
+    ){
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ){
+            if(icon != null) {
+                Box(
+                   modifier = Modifier.padding(start = 20.dp)
+                ){ icon() }
+
+            }
+            Text(
+                text = text,
+                style = MaterialTheme.typography.titleMedium
+            )
+        }
+    }
+}
 
 @Composable
 fun CardButton(
@@ -106,7 +141,8 @@ fun CardButton(
 ){
     Surface(
         onClick = onClick,
-        modifier = modifier
+        modifier = modifier,
+        shape = RoundedCornerShape(12.dp)
     ) { // 需要clickedable
         Row(
             modifier = Modifier.padding(16.dp),

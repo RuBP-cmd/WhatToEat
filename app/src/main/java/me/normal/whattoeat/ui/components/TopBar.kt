@@ -21,11 +21,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun TopBar(
+fun AppTopBar(
     onClickReturn: (() -> Unit),
     title: String? = null,
     onClickMore: (() -> Unit)? = null
 ){
+    val componentColor = MaterialTheme.colorScheme.onPrimary
     Row(
         modifier = Modifier.fillMaxWidth().background(color = MaterialTheme.colorScheme.primary),
         horizontalArrangement = Arrangement.SpaceBetween, // 左边的放最左，右边的放最右，其余均分排布
@@ -34,14 +35,15 @@ fun TopBar(
         AppIconButton(onClickReturn){
             Icon(
                 imageVector = Icons.Filled.ChevronLeft,
-                contentDescription = "返回"
+                contentDescription = "返回",
+                tint = componentColor
             )
         }
 
         title?.let{
             Text(
                 text = it,
-                color = MaterialTheme.colorScheme.onPrimary,
+                color = componentColor,
                 style = MaterialTheme.typography.titleLarge
             )
         }
@@ -56,7 +58,8 @@ fun TopBar(
             AppIconButton(onClickMore){
                 Icon(
                     imageVector = Icons.Filled.MoreVert,
-                    contentDescription = "更多"
+                    contentDescription = "更多",
+                    tint = componentColor
                 )
             }
         }
@@ -67,5 +70,5 @@ fun TopBar(
 @Preview
 @Composable
 private fun TopBarPreview(){
-    TopBar({}, "title", {})
+    AppTopBar({}, "title", {})
 }

@@ -15,9 +15,11 @@ class FoodViewModel (
     val foods: StateFlow<List<Food>> = repository.getAll()
         .stateIn( // Flow变为StateFlow
             scope = viewModelScope, // 绑定ViewModel的生命周期
-            started = SharingStarted.WhileSubscribed(5000),
+            started = SharingStarted.Eagerly,
             initialValue = emptyList()
         )
+
+    var chosenFood = Food(name = "", weight = 1, marked = true)
 
     fun insert(food: Food){
         viewModelScope.launch{
@@ -38,7 +40,7 @@ class FoodViewModel (
     }
 
     fun choosenRandomFood(): String{
-        val foodList = foods.value.filter{ food -> food.marked }
+        val foodList = foods.value.filter{ food -> food.marked && !food.name.isEmpty() }
 
         if(foodList.isEmpty()) return "列表为空！"
 
@@ -53,8 +55,24 @@ class FoodViewModel (
 
         for(food in foodList){
             sumWeight += food.weight
-            if(sumWeight.toDouble() / totalWeight >= random) return food.name
+            if(sumWeight.toDouble() / totalWeight >= random) {
+                chosenFood = food
+                break
+            }
         }
-        return foodList.last().name
+        chosenFood = foodList.last()
+        return chosenFood.name
+    }
+
+    fun ignoreChosenFood(){
+        update(chosenFood.copy(marked = false))
+    }
+
+    fun clearAllIgnore(){
+        for(food in foods.value){
+            if(!food.marked){
+                update(food.copy(marked = true))
+            }
+        }
     }
 }

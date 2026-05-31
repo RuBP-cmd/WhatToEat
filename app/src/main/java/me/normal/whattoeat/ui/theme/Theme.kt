@@ -18,31 +18,31 @@ private val PurpleDarkScheme = darkColorScheme(
 private val PurpleLightScheme = lightColorScheme(
     primary = Purple40,
     secondary = lerp(Purple40, Color.White, 0.8f),
-    tertiary = Pink40
+    tertiary = lerp(Purple40, Color.White, 0.3f)
 )
 
 private val BlueLightScheme = lightColorScheme(
     primary = BluePrimary,
     secondary = lerp(BluePrimary, Color.White, 0.8f),
-    tertiary = NeutralTertiary
+    tertiary = lerp(BluePrimary, Color.White, 0.3f)
 )
 
 private val YellowLightScheme = lightColorScheme(
     primary = YellowPrimary,
     secondary = lerp(YellowPrimary, Color.White, 0.8f),
-    tertiary = NeutralTertiary
+    tertiary = lerp(YellowPrimary, Color.White, 0.3f)
 )
 
 private val GreenLightScheme = lightColorScheme(
     primary = GreenPrimary,
     secondary = lerp(GreenPrimary, Color.White, 0.8f),
-    tertiary = NeutralTertiary
+    tertiary = lerp(GreenPrimary, Color.White, 0.3f)
 )
 
 private val PinkLightScheme = lightColorScheme(
     primary = PinkPrimary,
     secondary = lerp(PinkPrimary, Color.White, 0.8f),
-    tertiary = NeutralTertiary
+    tertiary = lerp(PinkPrimary, Color.White, 0.3f)
 )
 
 
