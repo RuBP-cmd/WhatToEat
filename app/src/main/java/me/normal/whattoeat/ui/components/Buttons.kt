@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -143,30 +144,37 @@ fun CardButton(
         onClick = onClick,
         modifier = modifier,
         shape = RoundedCornerShape(12.dp)
-    ) { // 需要clickedable
+    ) {
         Row(
             modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(10.dp)
         ){
+            // Icon
             icon?.let{
                 it()
             }
 
-            Column(){
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.titleLarge
-                )
-                subtitle?.let{
+            Box(
+                contentAlignment = Alignment.CenterStart
+            ){
+                Column(){ // 主副标题
                     Text(
-                        text = it,
-                        style = MaterialTheme.typography.titleSmall
+                        text = title,
+                        style = MaterialTheme.typography.titleLarge
                     )
+                    subtitle?.let{
+                        Text(
+                            text = it,
+                            style = MaterialTheme.typography.titleSmall
+                        )
+                    }
                 }
             }
 
-            Icon(
+            Spacer(modifier = Modifier.weight(1f)) // 占满空间
+
+            Icon( //  >
                 imageVector = Icons.Filled.ArrowForward,
                 contentDescription = "点击跳转",
             )

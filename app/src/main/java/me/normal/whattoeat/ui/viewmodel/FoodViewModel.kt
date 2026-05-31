@@ -44,20 +44,25 @@ class FoodViewModel (
 
         if(foodList.isEmpty()) return "列表为空！"
 
+        if(foodList.size == 1) {
+            chosenFood = foodList.first()
+            return chosenFood.name
+        }
+
         var totalWeight = 0
         for(food in foodList){
+            if(food == chosenFood) continue // 排除上一次的选择
             totalWeight += food.weight
         }
 
-
-        var random = Math.random()
+        val random = Math.random()
         var sumWeight = 0
 
         for(food in foodList){
             sumWeight += food.weight
-            if(sumWeight.toDouble() / totalWeight >= random) {
+            if(sumWeight.toDouble() / totalWeight >= random && food != chosenFood) {
                 chosenFood = food
-                break
+                return chosenFood.name
             }
         }
         chosenFood = foodList.last()
