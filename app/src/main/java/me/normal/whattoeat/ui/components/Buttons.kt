@@ -27,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlin.collections.listOf
@@ -111,6 +112,7 @@ fun CardButton(
 ){
     Surface(
         onClick = onClick,
+        color = Color.Transparent, // 改为透明，方便融入背景
         modifier = modifier,
         shape = RoundedCornerShape(12.dp)
     ){
@@ -138,17 +140,19 @@ fun CardButton(
     modifier: Modifier = Modifier,
     subtitle: String? = null,
     icon: (@Composable () -> Unit)? = null,
+    isNavigable: Boolean = true,
     onClick: () -> Unit
 ){
     Surface(
         onClick = onClick,
+        color = Color.Transparent, // 改为透明，方便融入背景
         modifier = modifier,
         shape = RoundedCornerShape(12.dp)
     ) {
         Row(
             modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(10.dp)
+            horizontalArrangement = Arrangement.spacedBy(20.dp)
         ){
             // Icon
             icon?.let{
@@ -174,10 +178,13 @@ fun CardButton(
 
             Spacer(modifier = Modifier.weight(1f)) // 占满空间
 
-            Icon( //  >
-                imageVector = Icons.Filled.ArrowForward,
-                contentDescription = "点击跳转",
-            )
+            if(isNavigable){
+                Icon( //  >
+                    imageVector = Icons.Filled.ArrowForward,
+                    contentDescription = "点击跳转",
+                    modifier = Modifier.size(24.dp)
+                )
+            }
         }
     }
 }

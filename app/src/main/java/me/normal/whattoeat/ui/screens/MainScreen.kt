@@ -8,7 +8,6 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
@@ -18,7 +17,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -35,6 +33,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import kotlinx.serialization.Serializable
+import me.normal.whattoeat.MainApplication
 import me.normal.whattoeat.data.local.database.AppDatabase
 import me.normal.whattoeat.data.repository.FoodRepository
 import me.normal.whattoeat.ui.screens.home.HomeScreen
@@ -54,23 +53,21 @@ object FoodEdit
 @Serializable
 object Eat
 @Serializable
-object PraticalWebsite
+object PracticalWebsite
 @Serializable
 object Other
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+//@OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
 fun MainScreen(){
-    val navController = rememberNavController();
-    val context = LocalContext.current
-
+    val navController = rememberNavController()
+    val application = LocalContext.current.applicationContext as MainApplication // 仅临时用
     val foodViewModel: FoodViewModel = viewModel(
         factory = viewModelFactory {
             initializer {
-                // 直接在这里组装你的 ViewModel
-                FoodViewModel(FoodRepository(AppDatabase.getInstance(context).foodDao()))
+                FoodViewModel(application.foodRepository)
             }
         }
     )
@@ -85,7 +82,7 @@ fun MainScreen(){
             NavHost(navController, Home){
                 composable<Home>{ HomeScreen(
                     onNavigateToEat = { navController.navigate(Eat)}, // Home -> Eat
-                    onNavigateToPracticalWebsite = { navController.navigate(PraticalWebsite) }, // Home -> PraticalWebsite
+                    onNavigateToPracticalWebsite = { navController.navigate(PracticalWebsite) }, // Home -> PracticalWebsite
                     onNavigateToOther = { navController.navigate(Other) }
                 ) }
                 composable<Settings>{ SettingsScreen() }
@@ -98,7 +95,7 @@ fun MainScreen(){
                     foodViewModel = foodViewModel,
                     onReturnToEat = { navController.popBackStack()}
                 ) } // Eat <- FoodEdit
-                composable<PraticalWebsite>{ PracticalWebsiteScreen { navController.popBackStack() } }
+                composable<PracticalWebsite>{ PracticalWebsiteScreen { navController.popBackStack() } }
                 composable<Other>{ OtherScreen{ navController.popBackStack() } }
             }
         }
@@ -123,8 +120,8 @@ fun MainScreenNav(
         data class Item(
             val label: String,
             val selected: Boolean,
-            val FilledVector: ImageVector,
-            val OutlinedVector: ImageVector,
+            val filledVector: ImageVector,
+            val outlinedVector: ImageVector,
             val route: Any
         )
 
@@ -133,7 +130,7 @@ fun MainScreenNav(
             Item("设置", selectedSettings, Icons.Filled.Settings, Icons.Outlined.Settings, Settings)
         )
 
-        NavigationBar() {
+        NavigationBar {
             for (item in itemList){
                 NavigationBarItem(
                     selected = item.selected,
@@ -152,7 +149,7 @@ fun MainScreenNav(
                     ) },
                     icon = {
                         Icon(
-                            imageVector = if(item.selected) item.FilledVector else item.OutlinedVector,
+                            imageVector = if(item.selected) item.filledVector else item.outlinedVector,
                             contentDescription = null,
                             tint = if(item.selected) MaterialTheme.colorScheme.primary else LocalContentColor.current
                         )

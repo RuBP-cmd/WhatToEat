@@ -7,66 +7,105 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.launch
-import me.normal.whattoeat.data.local.config.Config
-import me.normal.whattoeat.ui.components.ListCard
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
+import me.normal.whattoeat.MainApplication
+import me.normal.whattoeat.R
+import me.normal.whattoeat.ui.components.CardButton
+import me.normal.whattoeat.ui.components.TitleCard
 import me.normal.whattoeat.ui.theme.ColorTheme
+import me.normal.whattoeat.ui.viewmodel.SettingsViewModel
 
 
 @Preview
 @Composable
 fun SettingsScreen(){
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
+    val application = LocalContext.current.applicationContext as MainApplication // 仅临时
+    val settingsViewModel: SettingsViewModel = viewModel(
+        factory = viewModelFactory {
+            initializer {
+                SettingsViewModel(application.settingsRepository)
+            }
+        }
+    )
+
+    val titleCardModifier = Modifier.width(300.dp)
+    LazyColumn(
+        modifier = Modifier.fillMaxSize().padding(top = 70.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(30.dp)
     ){
-        ListCard(
-            title = "颜色设置",
-            modifier = Modifier.width(300.dp)
+
+        item {
+            ColorSettings(settingsViewModel, titleCardModifier)
+        }
+        item {
+            AppInfo(titleCardModifier)
+        }
+
+    }
+}
+
+@Composable
+private fun ColorSettings(
+    settingsViewModel: SettingsViewModel,
+    modifier: Modifier
+){
+    TitleCard(
+        title = "颜色设置",
+        modifier = modifier
+    ){
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally
         ){
-            Column(
-                modifier = Modifier.background(color = MaterialTheme.colorScheme.secondary),
-                horizontalAlignment = Alignment.CenterHorizontally
+            Box(
+                modifier = Modifier.fillMaxWidth().padding(vertical = 10.dp),
+                contentAlignment = Alignment.Center
             ){
-                Box(
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 10.dp),
-                    contentAlignment = Alignment.Center
-                ){
-                    Text(
-                        text = "更换主题",
-                        style = MaterialTheme.typography.titleSmall
+                Text(
+                    text = "更换主题",
+                    style = MaterialTheme.typography.titleSmall
+                )
+            }
+
+
+            Row(
+                modifier = Modifier.padding(10.dp).fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceAround,
+                verticalAlignment = Alignment.CenterVertically
+            ){
+                val nowColorTheme by settingsViewModel.colorTheme.collectAsState()
+                for(colorTheme in ColorTheme.entries){
+                    ColorChooserItem(
+                        colorTheme = colorTheme,
+                        chosen = colorTheme == nowColorTheme,
+                        onClickChosen = { settingsViewModel.saveColorTheme(colorTheme) }
                     )
-                }
-
-
-                Row(
-                    modifier = Modifier.padding(10.dp).fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceAround,
-                    verticalAlignment = Alignment.CenterVertically
-                ){
-                    val context = LocalContext.current
-                    val nowColorTheme by Config.colorThemeFlow(context).collectAsState(ColorTheme.Pink)
-                    for(colorTheme in ColorTheme.entries){
-                        ColorChooserItem(colorTheme, colorTheme == nowColorTheme)
-                    }
                 }
             }
         }
@@ -74,9 +113,43 @@ fun SettingsScreen(){
 }
 
 @Composable
-private fun ColorChooserItem(colorTheme: ColorTheme, chosen: Boolean){
-    val scope = rememberCoroutineScope() // 协程作用域，并且只要组件还再就有，刷新ui不会重复创建
-    val context = LocalContext.current
+private fun AppInfo(
+    modifier: Modifier
+){
+    val uriHandler = LocalUriHandler.current
+
+    TitleCard(
+        title = "软件信息",
+        modifier = modifier
+    ){
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally
+        ){
+            CardButton(
+                title = "关于本程序",
+                subtitle = "版本号：0.7.5",
+                icon = {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(R.drawable.github),
+                        contentDescription = "跳转至github仓库",
+                        modifier = Modifier.size(45.dp)
+                    )
+                }
+            ){
+                uriHandler.openUri("https://github.com/RuBP-cmd/Algorithm")
+            }
+
+        }
+
+    }
+}
+
+@Composable
+private fun ColorChooserItem(
+    colorTheme: ColorTheme,
+    chosen: Boolean,
+    onClickChosen: () -> Unit
+){
     Surface(
         color = colorTheme.toColorScheme(isSystemInDarkTheme()).primary,
         modifier = (if(chosen) Modifier.border(
@@ -85,14 +158,7 @@ private fun ColorChooserItem(colorTheme: ColorTheme, chosen: Boolean){
             shape = RoundedCornerShape(6.dp)
         ) else Modifier).padding(3.dp).width(30.dp).height(30.dp),
         shape = RoundedCornerShape(5.dp),
-        onClick = {
-            scope.launch{ // 启动一个协程
-                Config.saveColorTheme(context, colorTheme)
-            }
-        }
-
-    ) {
-
-    }
+        onClick = onClickChosen
+    ) {}
 }
 

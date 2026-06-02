@@ -1,9 +1,5 @@
 package me.normal.whattoeat.ui.screens.misc
 
-import CenterText
-import android.sax.ElementListener
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize

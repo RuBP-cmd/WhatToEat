@@ -1,3 +1,5 @@
+import android.provider.CalendarContract
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Text
@@ -10,19 +12,20 @@ import androidx.compose.ui.text.TextStyle
 
 
 @Composable
-fun CenterText(
+fun BoxText(
     text: String,
     modifier: Modifier = Modifier,
-    color: Color = Color.Unspecified,
+    backgroundColor: Color = Color.Transparent,
+    textColor: Color = Color.Unspecified,
     style: TextStyle = LocalTextStyle.current
 ){
     Box(
-        modifier = modifier,
-        contentAlignment = Alignment.Center
+        modifier = modifier.background(color = backgroundColor), // 背景颜色
+        contentAlignment = Alignment.Center // 默认正中间
     ){
         Text(
             text = text,
-            color = color,
+            color = textColor,
             style = style
         )
     }

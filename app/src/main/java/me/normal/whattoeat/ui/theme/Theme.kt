@@ -12,37 +12,42 @@ import androidx.compose.ui.graphics.lerp
 private val PurpleDarkScheme = darkColorScheme(
     primary = Purple80,
     secondary = PurpleGrey80,
-    tertiary = Pink80
+    tertiary = Pink80,
 )
 
 private val PurpleLightScheme = lightColorScheme(
     primary = Purple40,
     secondary = lerp(Purple40, Color.White, 0.8f),
-    tertiary = lerp(Purple40, Color.White, 0.3f)
+    tertiary = lerp(Purple40, Color.White, 0.3f),
+    onSecondary = Color.Black
 )
 
 private val BlueLightScheme = lightColorScheme(
     primary = BluePrimary,
     secondary = lerp(BluePrimary, Color.White, 0.8f),
-    tertiary = lerp(BluePrimary, Color.White, 0.3f)
+    tertiary = lerp(BluePrimary, Color.White, 0.3f),
+    onSecondary = Color.Black
 )
 
 private val YellowLightScheme = lightColorScheme(
     primary = YellowPrimary,
     secondary = lerp(YellowPrimary, Color.White, 0.8f),
-    tertiary = lerp(YellowPrimary, Color.White, 0.3f)
+    tertiary = lerp(YellowPrimary, Color.White, 0.3f),
+    onSecondary = Color.Black
 )
 
 private val GreenLightScheme = lightColorScheme(
     primary = GreenPrimary,
     secondary = lerp(GreenPrimary, Color.White, 0.8f),
-    tertiary = lerp(GreenPrimary, Color.White, 0.3f)
+    tertiary = lerp(GreenPrimary, Color.White, 0.3f),
+    onSecondary = Color.Black
 )
 
 private val PinkLightScheme = lightColorScheme(
     primary = PinkPrimary,
     secondary = lerp(PinkPrimary, Color.White, 0.8f),
-    tertiary = lerp(PinkPrimary, Color.White, 0.3f)
+    tertiary = lerp(PinkPrimary, Color.White, 0.3f),
+    onSecondary = Color.Black
 )
 
 
@@ -62,6 +67,7 @@ enum class ColorTheme{
             ColorTheme.Purple -> if (darkTheme) PurpleDarkScheme else PurpleLightScheme
         }
     }
+
 }
 
 

@@ -1,13 +1,10 @@
 package me.normal.whattoeat.ui.screens.misc
 
-import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -60,7 +57,7 @@ fun PracticalWebsiteScreen(
                 .fillMaxWidth()
                 .height(75.dp)
             val uriHandler = LocalUriHandler.current
-            val iconModifer = Modifier.size(36.dp)
+            val iconModifier = Modifier.size(36.dp)
 
             data class Item(val title: String, val subtitle: String, val url: String, val iconSrc: Any)
 
@@ -74,8 +71,8 @@ fun PracticalWebsiteScreen(
                 Item(
                     "电费网站",
                     "Queen提供的电费网站",
-                    "http://payment.xidian.edu.cn/MNetWorkUI/showPublic",
-                            Icons.Filled.Public
+                    "https://ignypt.xidian.edu.cn/revenueH5/mainPage",
+                    Icons.Filled.Public
                 ),
                 Item(
                     "劳动教育查询",
@@ -117,15 +114,15 @@ fun PracticalWebsiteScreen(
                     icon = {
                         if(item.iconSrc is ImageVector){
                             Icon(
-                                imageVector = item.iconSrc as ImageVector,
+                                imageVector = item.iconSrc,
                                 contentDescription = null,
-                                modifier = iconModifer
+                                modifier = iconModifier
                             )
                         } else if(item.iconSrc is Int){
                             Image(
-                                painter = painterResource(item.iconSrc as Int),
+                                painter = painterResource(item.iconSrc),
                                 contentDescription = null,
-                                modifier = iconModifer
+                                modifier = iconModifier
                             )
                         }
                     }
@@ -139,6 +136,6 @@ fun PracticalWebsiteScreen(
 
 @Preview
 @Composable
-fun PraticalWebsiteScreenPreview(){
+fun PracticalWebsiteScreenPreview(){
     PracticalWebsiteScreen {  }
 }

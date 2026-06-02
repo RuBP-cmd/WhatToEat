@@ -3,6 +3,7 @@ package me.normal.whattoeat.ui.screens.home
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -18,7 +19,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import me.normal.whattoeat.ui.components.CardButton
-import me.normal.whattoeat.ui.components.PrimaryButton
 
 
 @Composable
@@ -37,10 +37,10 @@ fun HomeScreen(
         MobaMessageCard()
 
         Column(
-            modifier = Modifier.padding(30.dp),
+            modifier = Modifier.width(IntrinsicSize.Max),
 //            verticalArrangement = Arrangement.spacedBy(10.dp)
         ){
-            val modifier = Modifier.width(200.dp).height(80.dp)
+            val modifier = Modifier.height(80.dp)
             CardButton(
                 title = "Moba",
                 subtitle = "我们需要开始moba！",
@@ -53,7 +53,7 @@ fun HomeScreen(
             ){ onNavigateToPracticalWebsite() }
             CardButton(
                 title = "其他",
-                modifier = modifier
+                modifier = modifier,
             ){ onNavigateToOther() }
         }
     }
