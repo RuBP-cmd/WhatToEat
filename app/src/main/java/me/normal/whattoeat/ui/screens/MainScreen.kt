@@ -34,11 +34,9 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import kotlinx.serialization.Serializable
 import me.normal.whattoeat.MainApplication
-import me.normal.whattoeat.data.local.database.AppDatabase
-import me.normal.whattoeat.data.repository.FoodRepository
 import me.normal.whattoeat.ui.screens.home.HomeScreen
-import me.normal.whattoeat.ui.screens.misc.EatScreen
-import me.normal.whattoeat.ui.screens.misc.FoodEditScreen
+import me.normal.whattoeat.ui.screens.food.EatScreen
+import me.normal.whattoeat.ui.screens.food.FoodEditScreen
 import me.normal.whattoeat.ui.screens.misc.OtherScreen
 import me.normal.whattoeat.ui.screens.misc.PracticalWebsiteScreen
 import me.normal.whattoeat.ui.screens.settings.SettingsScreen

@@ -14,6 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -27,6 +28,7 @@ fun HomeScreen(
     onNavigateToPracticalWebsite: () -> Unit,
     onNavigateToOther: () -> Unit
 ){
+    val uriHandler = LocalUriHandler.current
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -40,7 +42,7 @@ fun HomeScreen(
             modifier = Modifier.width(IntrinsicSize.Max),
 //            verticalArrangement = Arrangement.spacedBy(10.dp)
         ){
-            val modifier = Modifier.height(80.dp)
+            val modifier = Modifier.height(70.dp)
             CardButton(
                 title = "Moba",
                 subtitle = "我们需要开始moba！",
@@ -51,6 +53,11 @@ fun HomeScreen(
                 subtitle = "看看有哪些实用网站",
                 modifier = modifier
             ){ onNavigateToPracticalWebsite() }
+            CardButton(
+                title = "测网速",
+                subtitle = "感觉学校网又卡了？",
+                modifier = modifier
+            ){ uriHandler.openUri("https://test.xidian.edu.cn") }
             CardButton(
                 title = "其他",
                 modifier = modifier,

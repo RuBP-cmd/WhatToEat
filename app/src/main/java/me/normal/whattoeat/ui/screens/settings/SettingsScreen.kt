@@ -132,7 +132,7 @@ private fun AppInfo(
                     Icon(
                         imageVector = ImageVector.vectorResource(R.drawable.github),
                         contentDescription = "跳转至github仓库",
-                        modifier = Modifier.size(45.dp)
+                        modifier = Modifier.size(36.dp)
                     )
                 }
             ){

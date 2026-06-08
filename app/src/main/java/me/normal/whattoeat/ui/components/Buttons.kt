@@ -2,7 +2,6 @@ package me.normal.whattoeat.ui.components
 
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,7 +15,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
-import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -29,27 +27,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import kotlin.collections.listOf
 
-@Composable
-fun PrimaryButton(
-    text: String,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit
-){
-    Button(
-        onClick = onClick,
-        modifier = modifier
-            .width(180.dp)
-            .height(80.dp)
-    ){
-        Text(
-            text = text,
-            fontSize = 30.sp
-        )
-    }
-}
 
 @Composable
 fun ElegantButton(
@@ -152,7 +130,7 @@ fun CardButton(
         Row(
             modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(20.dp)
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
         ){
             // Icon
             icon?.let{
@@ -162,10 +140,10 @@ fun CardButton(
             Box(
                 contentAlignment = Alignment.CenterStart
             ){
-                Column(){ // 主副标题
+                Column{ // 主副标题
                     Text(
                         text = title,
-                        style = MaterialTheme.typography.titleLarge
+                        style = MaterialTheme.typography.titleMedium
                     )
                     subtitle?.let{
                         Text(

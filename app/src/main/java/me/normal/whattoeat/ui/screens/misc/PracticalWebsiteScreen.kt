@@ -2,7 +2,6 @@ package me.normal.whattoeat.ui.screens.misc
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -10,9 +9,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddTask
 import androidx.compose.material.icons.filled.Filter
+import androidx.compose.material.icons.filled.NetworkCell
 import androidx.compose.material.icons.filled.Public
 import androidx.compose.material.icons.filled.SavedSearch
 import androidx.compose.material.icons.filled.Search
@@ -44,22 +46,23 @@ fun PracticalWebsiteScreen(
         }
     ) { paddingValues ->
 
-        Column(
+        val modifier = Modifier
+            .fillMaxWidth()
+            .height(75.dp)
+        val uriHandler = LocalUriHandler.current
+        val iconModifier = Modifier.size(36.dp)
+        data class Item(val title: String, val subtitle: String, val url: String, val iconSrc: Any)
+
+        LazyColumn(
             modifier = Modifier
-                .width(IntrinsicSize.Max) // 内部控件宽度的最大值
+                .width(500.dp)
                 .fillMaxHeight()
                 .padding(paddingValues)
                 .padding(top = 30.dp, start = 30.dp, end = 30.dp),
             verticalArrangement = Arrangement.spacedBy(5.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ){
-            val modifier = Modifier
-                .fillMaxWidth()
-                .height(75.dp)
-            val uriHandler = LocalUriHandler.current
-            val iconModifier = Modifier.size(36.dp)
 
-            data class Item(val title: String, val subtitle: String, val url: String, val iconSrc: Any)
 
             val items = listOf(
                 Item(
@@ -103,10 +106,16 @@ fun PracticalWebsiteScreen(
                     "甚至B站",
                     "https://www.bilibili.com/",
                     R.drawable.bilibili
+                ),
+                Item(
+                    title = "IP纯净度测试",
+                    subtitle = "测测你的IP是否干净",
+                    url = "https://ping0.cc/",
+                    iconSrc = Icons.Filled.NetworkCell
                 )
             )
 
-            for(item in items){
+            items(items) { item ->
                 CardButton(
                     title = item.title,
                     subtitle = item.subtitle,
