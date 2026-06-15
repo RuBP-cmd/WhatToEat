@@ -1,13 +1,11 @@
 package me.normal.whattoeat.ui.screens.settings
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -40,6 +38,7 @@ import me.normal.whattoeat.ui.components.CardButton
 import me.normal.whattoeat.ui.components.TitleCard
 import me.normal.whattoeat.ui.theme.ColorTheme
 import me.normal.whattoeat.ui.viewmodel.SettingsViewModel
+import me.normal.whattoeat.BuildConfig
 
 
 @Preview
@@ -56,7 +55,9 @@ fun SettingsScreen(){
 
     val titleCardModifier = Modifier.width(300.dp)
     LazyColumn(
-        modifier = Modifier.fillMaxSize().padding(top = 70.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(top = 70.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(30.dp)
     ){
@@ -84,7 +85,9 @@ private fun ColorSettings(
             horizontalAlignment = Alignment.CenterHorizontally
         ){
             Box(
-                modifier = Modifier.fillMaxWidth().padding(vertical = 10.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 10.dp),
                 contentAlignment = Alignment.Center
             ){
                 Text(
@@ -95,7 +98,9 @@ private fun ColorSettings(
 
 
             Row(
-                modifier = Modifier.padding(10.dp).fillMaxWidth(),
+                modifier = Modifier
+                    .padding(10.dp)
+                    .fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceAround,
                 verticalAlignment = Alignment.CenterVertically
             ){
@@ -127,7 +132,7 @@ private fun AppInfo(
         ){
             CardButton(
                 title = "关于本程序",
-                subtitle = "版本号：0.7.5",
+                subtitle = "版本号：${BuildConfig.VERSION_NAME}",
                 icon = {
                     Icon(
                         imageVector = ImageVector.vectorResource(R.drawable.github),
@@ -136,7 +141,7 @@ private fun AppInfo(
                     )
                 }
             ){
-                uriHandler.openUri("https://github.com/RuBP-cmd/Algorithm")
+                uriHandler.openUri("https://github.com/RuBP-cmd/WhatToEat")
             }
 
         }
@@ -156,7 +161,10 @@ private fun ColorChooserItem(
             width = 2.dp,
             color = MaterialTheme.colorScheme.primary,
             shape = RoundedCornerShape(6.dp)
-        ) else Modifier).padding(3.dp).width(30.dp).height(30.dp),
+        ) else Modifier)
+            .padding(3.dp)
+            .width(30.dp)
+            .height(30.dp),
         shape = RoundedCornerShape(5.dp),
         onClick = onClickChosen
     ) {}

@@ -59,8 +59,9 @@ class FoodViewModel (
         var sumWeight = 0
 
         for(food in foodList){
+            if(food == chosenFood) continue; // 不应该把这个的权重算进去，修复一个逻辑bug
             sumWeight += food.weight
-            if(sumWeight.toDouble() / totalWeight >= random && food != chosenFood) {
+            if(sumWeight.toDouble() / totalWeight >= random) {
                 chosenFood = food
                 return chosenFood.name
             }

@@ -68,7 +68,7 @@ fun PracticalWebsiteScreen(
                 Item(
                     "一站式服务大厅",
                     "泥电一站式服务大厅...",
-                    "https://ids.xidian.edu.cn/authserver/login?service=https%3A%2F%2Fehall.xidian.edu.cn%3A443%2Fnew%2Findex_xd.html",
+                    "https://ehall.xidian.edu.cn/",
                     Icons.Outlined.AccountBalance
                 ),
                 Item(

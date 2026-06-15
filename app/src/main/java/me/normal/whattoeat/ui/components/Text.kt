@@ -1,4 +1,5 @@
-import android.provider.CalendarContract
+package me.normal.whattoeat.ui.components
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.LocalTextStyle
