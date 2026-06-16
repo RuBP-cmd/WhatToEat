@@ -10,13 +10,24 @@ import me.normal.whattoeat.data.local.entry.Food
 
 @Dao
 interface FoodDao {
+    @Query("SELECT * FROM food WHERE table_id = :tableId ORDER BY time_stamp ASC")
+    fun getByTableId(tableId: Int): Flow<List<Food>>
+
     @Query("SELECT * FROM food ORDER BY time_stamp ASC")
     fun getAll(): Flow<List<Food>>
 
     @Update
     suspend fun update(food: Food)
+
     @Insert
     suspend fun insert(food: Food)
+
     @Delete
     suspend fun delete(food: Food)
+
+    @Query("DELETE FROM food WHERE table_id = :tableId")
+    suspend fun deleteByTableId(tableId: Int)
+
+    @Query("UPDATE food SET marked = :marked WHERE table_id = :tableId")
+    suspend fun updateAllMarked(tableId: Int, marked: Boolean)
 }

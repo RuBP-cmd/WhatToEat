@@ -10,5 +10,6 @@ data class Food(
     @ColumnInfo(name = "time_stamp") val timeStamp: Long = System.currentTimeMillis(),
     @ColumnInfo(name = "name") val name: String,
     @ColumnInfo(name = "weight") val weight: Int,
-    @ColumnInfo(name = "marked") val marked: Boolean
+    @ColumnInfo(name = "marked") val marked: Boolean,
+    @ColumnInfo(name = "table_id") val tableId: Int = 1
 )
