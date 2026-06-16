@@ -2,7 +2,6 @@ package me.normal.whattoeat.ui.screens.misc
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -11,14 +10,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddTask
-import androidx.compose.material.icons.filled.Filter
-import androidx.compose.material.icons.filled.NetworkCell
-import androidx.compose.material.icons.filled.Public
-import androidx.compose.material.icons.filled.SavedSearch
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.outlined.AccountBalance
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -29,7 +20,7 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import me.normal.whattoeat.R
+import me.normal.whattoeat.model.practicalWebsites
 import me.normal.whattoeat.ui.components.AppTopBar
 import me.normal.whattoeat.ui.components.CardButton
 
@@ -51,7 +42,6 @@ fun PracticalWebsiteScreen(
             .height(75.dp)
         val uriHandler = LocalUriHandler.current
         val iconModifier = Modifier.size(36.dp)
-        data class Item(val title: String, val subtitle: String, val url: String, val iconSrc: Any)
 
         LazyColumn(
             modifier = Modifier
@@ -62,74 +52,20 @@ fun PracticalWebsiteScreen(
             verticalArrangement = Arrangement.spacedBy(5.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ){
-
-
-            val items = listOf(
-                Item(
-                    "一站式服务大厅",
-                    "泥电一站式服务大厅...",
-                    "https://ehall.xidian.edu.cn/",
-                    Icons.Outlined.AccountBalance
-                ),
-                Item(
-                    "电费网站",
-                    "Queen提供的电费网站",
-                    "https://ignypt.xidian.edu.cn/revenueH5/mainPage",
-                    Icons.Filled.Public
-                ),
-                Item(
-                    "劳动教育查询",
-                    "查看劳动教育学时是否已满",
-                    "https://xgxt.xidian.edu.cn/xsfw/sys/ldjyappxidian/*default/index.do#/wdjykc",
-                    Icons.Filled.Search
-                ),
-                Item(
-                    "四六级报名",
-                    "会赢的",
-                    "http://cet-bm.neea.edu.cn",
-                    Icons.Filled.AddTask
-                ),
-                Item(
-                    "选课",
-                    "别睡了，该起床抢课了",
-                    "http://xk.xidian.edu.cn",
-                    Icons.Filled.Filter
-                ),
-                Item(
-                    "社会实践项目查询",
-                    "看看自己社会实践做了几个？",
-                    "https://jinshuju.com/f/Yc2cNy/s/tAkU85",
-                    Icons.Filled.SavedSearch
-                ),
-                Item(
-                    "Bilibili",
-                    "甚至B站",
-                    "https://www.bilibili.com/",
-                    R.drawable.bilibili
-                ),
-                Item(
-                    title = "IP纯净度测试",
-                    subtitle = "测测你的IP是否干净",
-                    url = "https://ping0.cc/",
-                    iconSrc = Icons.Filled.NetworkCell
-                )
-            )
-
-            items(items) { item ->
+            items(practicalWebsites) { item ->
                 CardButton(
                     title = item.title,
                     subtitle = item.subtitle,
                     modifier = modifier,
                     icon = {
-                        if(item.iconSrc is ImageVector){
-                            Icon(
-                                imageVector = item.iconSrc,
+                        when (val src = item.iconSource) {
+                            is ImageVector -> Icon(
+                                imageVector = src,
                                 contentDescription = null,
                                 modifier = iconModifier
                             )
-                        } else if(item.iconSrc is Int){
-                            Image(
-                                painter = painterResource(item.iconSrc),
+                            is Int -> Image(
+                                painter = painterResource(src),
                                 contentDescription = null,
                                 modifier = iconModifier
                             )

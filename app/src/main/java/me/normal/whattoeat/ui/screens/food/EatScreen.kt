@@ -49,7 +49,7 @@ fun EatScreen(
         foodName = foodName,
         onNavigateToFoodEdit = onNavigateToFoodEdit,
         onReturnToHome = onReturnToHome,
-        onClickRandomFood = { foodName = foodViewModel.choosenRandomFood() },
+        onClickRandomFood = { foodName = foodViewModel.chosenRandomFood() },
         onClickClear = { foodName = "点击查询今天吃什么" },
         onClickIgnore = { foodViewModel.ignoreChosenFood() },
         onClickClearIgnore = { foodViewModel.clearAllIgnore() }
