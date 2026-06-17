@@ -89,11 +89,11 @@ fun EditBookmarkSidebar(
                     tonalElevation = 2.dp
                 ) {
                     Box(
-                        modifier = Modifier.fillMaxSize(),
+                        modifier = Modifier.fillMaxSize().padding(horizontal = 3.dp),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = table.name.take(2),
+                            text = table.name,
                             style = MaterialTheme.typography.labelSmall,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
@@ -170,7 +170,9 @@ fun EditBookmarkSidebar(
                 ) { Text("确定") }
             },
             dismissButton = {
-                TextButton(onClick = { showRenameDialog = false }) { Text("取消") }
+                TextButton(onClick = { showRenameDialog = false }) {
+                    Text(text = "取消", color = MaterialTheme.colorScheme.onSurface)
+                }
             }
         )
     }
@@ -190,7 +192,7 @@ fun EditBookmarkSidebar(
                 ) { Text("删除") }
             },
             dismissButton = {
-                TextButton(onClick = { showDeleteDialog = false }) { Text("取消") }
+                TextButton(onClick = { showDeleteDialog = false }) { Text(text = "取消", color = MaterialTheme.colorScheme.onSurface) }
             }
         )
     }

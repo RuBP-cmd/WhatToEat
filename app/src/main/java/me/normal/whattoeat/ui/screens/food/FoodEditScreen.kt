@@ -194,7 +194,7 @@ fun FoodEditContent(
                 TextButton(onClick = {
                     showCreateDialog = false
                     newTableName = ""
-                }) { Text("取消") }
+                }) { Text(text = "取消", color = MaterialTheme.colorScheme.onSurface) }
             }
         )
     }
