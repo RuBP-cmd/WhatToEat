@@ -13,26 +13,21 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Block
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.ClearAll
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.QueryStats
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -73,7 +68,6 @@ fun EatScreen(
             foodViewModel.switchTable(tableId)
             foodName = "点击查询今天吃什么"
         },
-        onCreateTable = { name -> foodViewModel.createTable(name) },
         onClickRandomFood = { foodName = foodViewModel.chosenRandomFood() },
         onClickClear = { foodName = "点击查询今天吃什么" },
         onClickIgnore = { foodViewModel.ignoreChosenFood() },
@@ -89,14 +83,11 @@ private fun EatContent(
     onNavigateToFoodEdit: () -> Unit,
     onReturnToHome: () -> Unit,
     onTableSelected: (Int) -> Unit,
-    onCreateTable: (String) -> Unit,
     onClickRandomFood: () -> Unit,
     onClickClear: () -> Unit,
     onClickIgnore: () -> Unit,
     onClickClearIgnore: () -> Unit
 ) {
-    var showCreateDialog by remember { mutableStateOf(false) }
-
     Scaffold(
         topBar = { AppTopBar(onReturnToHome, "Eat", onNavigateToFoodEdit) }
     ) { paddingValues ->
@@ -188,7 +179,6 @@ private fun EatContent(
                 tables = tables,
                 currentTableId = currentTableId,
                 onTableSelected = onTableSelected,
-                onAddTable = { showCreateDialog = true },
                 modifier = Modifier.align(Alignment.CenterEnd)
             )
 
@@ -210,16 +200,6 @@ private fun EatContent(
             }
         }
     }
-
-    if (showCreateDialog) {
-        CreateTableDialog(
-            onDismiss = { showCreateDialog = false },
-            onConfirm = {
-                onCreateTable(it)
-                showCreateDialog = false
-            }
-        )
-    }
 }
 
 // --- 书签侧栏 ---
@@ -229,7 +209,6 @@ private fun BookmarkSidebar(
     tables: List<FoodTable>,
     currentTableId: Int,
     onTableSelected: (Int) -> Unit,
-    onAddTable: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var expandedTableId by remember { mutableIntStateOf(-1) }
@@ -247,34 +226,13 @@ private fun BookmarkSidebar(
                 isActive = table.id == currentTableId,
                 isExpanded = table.id == expandedTableId,
                 onClick = {
-                    if (expandedTableId == table.id) {
-                        // 已展开，再次点击：切换到此表
-                        expandedTableId = -1
+                    expandedTableId = if (expandedTableId == table.id) {
+                        -1 // 已展开，再次点击：切换到此表
                     } else {
-                        // 未展开：展开显示完整表名
-                        expandedTableId = table.id
+                        table.id // 未展开：展开显示完整表名
                     }
                     onTableSelected(table.id)
                 }
-            )
-        }
-
-        // 新建表格按钮
-        AppIconButton(
-            onClick = {
-                expandedTableId = -1
-                onAddTable()
-            },
-            modifier = Modifier
-                .padding(end = 2.dp)
-                .size(32.dp)
-                .clip(RoundedCornerShape(topStart = 6.dp, bottomStart = 6.dp))
-                .background(MaterialTheme.colorScheme.surfaceVariant)
-        ) {
-            Icon(
-                imageVector = Icons.Filled.Add,
-                contentDescription = "新建表格",
-                modifier = Modifier.size(16.dp)
             )
         }
     }
@@ -327,41 +285,6 @@ private fun BookmarkItem(
     }
 }
 
-// --- 新建表格对话框 ---
-
-@Composable
-private fun CreateTableDialog(
-    onDismiss: () -> Unit,
-    onConfirm: (String) -> Unit
-) {
-    var tableName by remember { mutableStateOf("") }
-
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("新建表格") },
-        text = {
-            OutlinedTextField(
-                value = tableName,
-                onValueChange = { tableName = it },
-                label = { Text("表格名称") },
-                singleLine = true
-            )
-        },
-        confirmButton = {
-            TextButton(
-                onClick = { onConfirm(tableName.trim()) },
-                enabled = tableName.isNotBlank()
-            ) {
-                Text("创建")
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text("取消")
-            }
-        }
-    )
-}
 
 @Preview
 @Composable
@@ -377,7 +300,6 @@ private fun EatContentPreview() {
         onNavigateToFoodEdit = {},
         onReturnToHome = {},
         onTableSelected = {},
-        onCreateTable = {},
         onClickRandomFood = {},
         onClickClear = {},
         onClickIgnore = {},

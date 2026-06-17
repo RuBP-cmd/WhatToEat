@@ -1,8 +1,10 @@
 package me.normal.whattoeat.ui.screens.food
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,6 +27,8 @@ import androidx.compose.material.icons.filled.AddCircleOutline
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -37,6 +41,7 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -74,6 +79,8 @@ fun FoodEditScreen(
         currentTableId = currentTableId,
         onReturnToEat = onReturnToEat,
         onTableSelected = { foodViewModel.switchTable(it) },
+        onRenameTable = { tableId, name -> foodViewModel.renameTable(tableId, name) },
+        onDeleteTable = { tableId -> foodViewModel.deleteTable(tableId) },
         onCreateTable = { name -> foodViewModel.createTable(name) },
         onClickAddRow = { foodViewModel.insert(Food(name = "", weight = 1, marked = true)) },
         onClickDelRow = { food -> foodViewModel.delete(food) },
@@ -90,6 +97,8 @@ fun FoodEditContent(
     currentTableId: Int,
     onReturnToEat: () -> Unit,
     onTableSelected: (Int) -> Unit,
+    onRenameTable: (Int, String) -> Unit,
+    onDeleteTable: (Int) -> Unit,
     onCreateTable: (String) -> Unit,
     onClickAddRow: () -> Unit,
     onClickDelRow: (food: Food) -> Unit,
@@ -159,6 +168,8 @@ fun FoodEditContent(
                 tables = tables,
                 currentTableId = currentTableId,
                 onTableSelected = onTableSelected,
+                onRenameTable = onRenameTable,
+                onDeleteTable = onDeleteTable,
                 onAddTable = { showCreateDialog = true },
                 modifier = Modifier.align(Alignment.CenterEnd)
             )
@@ -202,14 +213,27 @@ fun FoodEditContent(
 
 // --- 简略书签侧栏 ---
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun SimpleBookmarkSidebar(
     tables: List<FoodTable>,
     currentTableId: Int,
     onTableSelected: (Int) -> Unit,
+    onRenameTable: (Int, String) -> Unit,
+    onDeleteTable: (Int) -> Unit,
     onAddTable: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    // 长按菜单状态
+    var contextMenuTableId by remember { mutableIntStateOf(-1) }
+    // 重命名对话框状态
+    var showRenameDialog by remember { mutableStateOf(false) }
+    var renameTableId by remember { mutableIntStateOf(-1) }
+    var renameText by remember { mutableStateOf("") }
+    // 删除确认对话框状态
+    var showDeleteDialog by remember { mutableStateOf(false) }
+    var deleteTableId by remember { mutableIntStateOf(-1) }
+
     Column(
         modifier = modifier
             .fillMaxHeight()
@@ -219,28 +243,58 @@ private fun SimpleBookmarkSidebar(
     ) {
         tables.forEach { table ->
             val isActive = table.id == currentTableId
-            Surface(
-                modifier = Modifier
-                    .width(44.dp)
-                    .height(32.dp)
-                    .clip(RoundedCornerShape(topStart = 6.dp, bottomStart = 6.dp))
-                    .clickable { onTableSelected(table.id) },
-                shape = RoundedCornerShape(topStart = 6.dp, bottomStart = 6.dp),
-                color = if (isActive) MaterialTheme.colorScheme.primary
-                else MaterialTheme.colorScheme.surfaceVariant,
-                tonalElevation = 2.dp
-            ) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
+
+            Box {
+                Surface(
+                    modifier = Modifier
+                        .width(44.dp)
+                        .height(32.dp)
+                        .clip(RoundedCornerShape(topStart = 6.dp, bottomStart = 6.dp))
+                        .combinedClickable(
+                            onClick = { onTableSelected(table.id) },
+                            onLongClick = { contextMenuTableId = table.id }
+                        ),
+                    shape = RoundedCornerShape(topStart = 6.dp, bottomStart = 6.dp),
+                    color = if (isActive) MaterialTheme.colorScheme.primary
+                    else MaterialTheme.colorScheme.surfaceVariant,
+                    tonalElevation = 2.dp
                 ) {
-                    Text(
-                        text = table.name.take(2),
-                        style = MaterialTheme.typography.labelSmall,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        color = if (isActive) MaterialTheme.colorScheme.onPrimary
-                        else MaterialTheme.colorScheme.onSurfaceVariant
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = table.name.take(2),
+                            style = MaterialTheme.typography.labelSmall,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            color = if (isActive) MaterialTheme.colorScheme.onPrimary
+                            else MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+
+                // 长按弹出菜单
+                DropdownMenu(
+                    expanded = contextMenuTableId == table.id,
+                    onDismissRequest = { contextMenuTableId = -1 }
+                ) {
+                    DropdownMenuItem(
+                        text = { Text("重命名") },
+                        onClick = {
+                            contextMenuTableId = -1
+                            renameTableId = table.id
+                            renameText = table.name
+                            showRenameDialog = true
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("删除") },
+                        onClick = {
+                            contextMenuTableId = -1
+                            deleteTableId = table.id
+                            showDeleteDialog = true
+                        }
                     )
                 }
             }
@@ -261,6 +315,55 @@ private fun SimpleBookmarkSidebar(
                 modifier = Modifier.size(14.dp)
             )
         }
+    }
+
+    // --- 重命名对话框 ---
+    if (showRenameDialog) {
+        var localText by remember(renameTableId) { mutableStateOf(renameText) }
+        AlertDialog(
+            onDismissRequest = { showRenameDialog = false },
+            title = { Text("重命名表格") },
+            text = {
+                OutlinedTextField(
+                    value = localText,
+                    onValueChange = { localText = it },
+                    label = { Text("表格名称") },
+                    singleLine = true
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        onRenameTable(renameTableId, localText.trim())
+                        showRenameDialog = false
+                    },
+                    enabled = localText.isNotBlank()
+                ) { Text("确定") }
+            },
+            dismissButton = {
+                TextButton(onClick = { showRenameDialog = false }) { Text("取消") }
+            }
+        )
+    }
+
+    // --- 删除确认对话框 ---
+    if (showDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            title = { Text("删除表格") },
+            text = { Text("确定要删除这个表格吗？\n表格内的所有食物也将被删除。") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        onDeleteTable(deleteTableId)
+                        showDeleteDialog = false
+                    }
+                ) { Text("删除") }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteDialog = false }) { Text("取消") }
+            }
+        )
     }
 }
 
@@ -401,6 +504,8 @@ fun FoodEditContentPreview() {
         currentTableId = 1,
         onReturnToEat = {},
         onTableSelected = {},
+        onRenameTable = { _, _ -> },
+        onDeleteTable = {},
         onCreateTable = {},
         onClickAddRow = {},
         onClickDelRow = {},

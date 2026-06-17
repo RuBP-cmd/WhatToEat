@@ -30,7 +30,7 @@ val practicalWebsites = listOf(
         iconSource = Icons.Filled.Search
     ),
     WebsiteItem(
-        title = "四六级报名",
+        title = "四六级",
         subtitle = "会赢的",
         url = "http://cet-bm.neea.edu.cn",
         iconSource = Icons.Filled.AddTask

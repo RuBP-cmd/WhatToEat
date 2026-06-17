@@ -27,22 +27,21 @@ class FoodViewModel(
         .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
     // 当前选中的表格 id
-    private val _currentTableId = MutableStateFlow(1)
-    val currentTableId: StateFlow<Int> = _currentTableId.asStateFlow()
+    private val _currentTableId = MutableStateFlow(1) // 内部为mutable，可以修改
+    val currentTableId: StateFlow<Int> = _currentTableId.asStateFlow() // 外部只读
 
     // 当前表格中的食物，切换表格时自动更新
     val foods: StateFlow<List<Food>> = _currentTableId.flatMapLatest { tableId ->
         foodRepository.getByTableId(tableId)
     }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
-    var chosenFood = Food(name = "", weight = 1, marked = true, tableId = 1)
+    var chosenFood: Food? = null
 
     init {
         // 首次启动无表时自动创建"默认"表格
         viewModelScope.launch {
-            val existing = foodTableRepository.getAll().first()
-            if (existing.isEmpty()) {
-                foodTableRepository.insert(FoodTable(name = "默认"))
+            if(foodTableRepository.getAll().first().isEmpty()){
+                createTable("默认")
             }
         }
     }
@@ -52,7 +51,7 @@ class FoodViewModel(
     fun switchTable(tableId: Int) {
         if (tableId == _currentTableId.value) return
         _currentTableId.value = tableId
-        chosenFood = Food(name = "", weight = 1, marked = true, tableId = tableId)
+        chosenFood = null
     }
 
     fun createTable(name: String) {
@@ -85,7 +84,7 @@ class FoodViewModel(
     // --- 食物 CRUD ---
 
     fun insert(food: Food) {
-        viewModelScope.launch {
+        viewModelScope.launch { // ui层不管之table_id，因此移到这里添加
             foodRepository.insert(food.copy(tableId = _currentTableId.value))
         }
     }
@@ -125,15 +124,15 @@ class FoodViewModel(
             sumWeight += food.weight
             if (sumWeight.toDouble() / totalWeight >= random) {
                 chosenFood = food
-                return chosenFood.name
+                return chosenFood!!.name // 一定非null
             }
         }
         chosenFood = candidates.last()
-        return chosenFood.name
+        return chosenFood!!.name
     }
 
     fun ignoreChosenFood() {
-        update(chosenFood.copy(marked = false))
+        update(chosenFood!!.copy(marked = false))
     }
 
     fun clearAllIgnore() {
