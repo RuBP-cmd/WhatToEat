@@ -15,23 +15,28 @@ import me.normal.whattoeat.data.local.entry.Food
 import me.normal.whattoeat.data.local.entry.FoodTable
 import me.normal.whattoeat.data.repository.FoodRepository
 import me.normal.whattoeat.data.repository.FoodTableRepository
+import me.normal.whattoeat.data.repository.SettingsRepository
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class FoodViewModel(
     private val foodRepository: FoodRepository,
-    private val foodTableRepository: FoodTableRepository
+    private val foodTableRepository: FoodTableRepository,
+    private val settingsRepository: SettingsRepository
 ) : ViewModel() {
 
     // 所有表格
     val tables: StateFlow<List<FoodTable>> = foodTableRepository.getAll()
         .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
-    // 当前选中的表格 id
-    private val _currentTableId = MutableStateFlow(1) // 内部为mutable，可以修改
-    val currentTableId: StateFlow<Int> = _currentTableId.asStateFlow() // 外部只读
+    // 当前选中的表格 id，将Flow转为StateFlow
+    val currentTableId: StateFlow<Int> = settingsRepository.currentTableIdFlow.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Eagerly,
+        initialValue = 1
+    )
 
     // 当前表格中的食物，切换表格时自动更新
-    val foods: StateFlow<List<Food>> = _currentTableId.flatMapLatest { tableId ->
+    val foods: StateFlow<List<Food>> = currentTableId.flatMapLatest { tableId ->
         foodRepository.getByTableId(tableId)
     }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
@@ -49,8 +54,8 @@ class FoodViewModel(
     // --- 表格管理 ---
 
     fun switchTable(tableId: Int) {
-        if (tableId == _currentTableId.value) return
-        _currentTableId.value = tableId
+        if (tableId == currentTableId.value) return
+        updateCurrentTableId(tableId)
         chosenFood = null
     }
 
@@ -67,15 +72,16 @@ class FoodViewModel(
         }
     }
 
+    // 删除表，注意删除的表是正在使用的表的情况，需要将表id切换到剩余的表
     fun deleteTable(tableId: Int) {
         viewModelScope.launch {
             foodRepository.deleteByTableId(tableId)
             foodTableRepository.deleteById(tableId)
-            if (_currentTableId.value == tableId) {
+            if (currentTableId.value == tableId) {
                 // 切换到剩余的表中
                 val remaining = tables.value.filter { it.id != tableId }
                 if (remaining.isNotEmpty()) {
-                    _currentTableId.value = remaining.first().id
+                    updateCurrentTableId(remaining.first().id)
                 }
             }
         }
@@ -85,7 +91,7 @@ class FoodViewModel(
 
     fun insert(food: Food) {
         viewModelScope.launch { // ui层不管之table_id，因此移到这里添加
-            foodRepository.insert(food.copy(tableId = _currentTableId.value))
+            foodRepository.insert(food.copy(tableId = currentTableId.value))
         }
     }
 
@@ -137,7 +143,13 @@ class FoodViewModel(
 
     fun clearAllIgnore() {
         viewModelScope.launch {
-            foodRepository.updateAllMarked(_currentTableId.value, marked = true)
+            foodRepository.updateAllMarked(currentTableId.value, marked = true)
+        }
+    }
+
+    fun updateCurrentTableId(currentTableId: Int){
+        viewModelScope.launch {
+            settingsRepository.saveCurrentTableId(currentTableId)
         }
     }
 }

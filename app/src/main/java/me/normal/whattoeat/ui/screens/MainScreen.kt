@@ -65,7 +65,11 @@ fun MainScreen(){
     val foodViewModel: FoodViewModel = viewModel(
         factory = viewModelFactory {
             initializer {
-                FoodViewModel(application.foodRepository, application.foodTableRepository)
+                FoodViewModel(
+                    application.foodRepository,
+                    application.foodTableRepository,
+                    application.settingsRepository
+                )
             }
         }
     )
