@@ -35,6 +35,7 @@ class FoodViewModel(
         initialValue = 1
     )
 
+    // 随着tableId的变化而变化的：
     // 当前表格中的食物，切换表格时自动更新
     val foods: StateFlow<List<Food>> = currentTableId.flatMapLatest { tableId ->
         foodRepository.getByTableId(tableId)
@@ -61,7 +62,10 @@ class FoodViewModel(
 
     fun createTable(name: String) {
         viewModelScope.launch {
-            foodTableRepository.insert(FoodTable(name = name))
+            val newTableId = foodTableRepository.insert(FoodTable(name = name)).toInt()
+            repeat(3) {
+                foodRepository.insert(Food(name = "", weight = 1, marked = true, tableId = newTableId))
+            }
         }
     }
 

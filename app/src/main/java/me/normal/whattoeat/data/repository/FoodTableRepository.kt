@@ -9,7 +9,7 @@ class FoodTableRepository(
 ) {
     fun getAll(): Flow<List<FoodTable>> = dao.getAll()
 
-    suspend fun insert(table: FoodTable) = dao.insert(table)
+    suspend fun insert(table: FoodTable): Long = dao.insert(table)
 
     suspend fun update(table: FoodTable) = dao.update(table)
 

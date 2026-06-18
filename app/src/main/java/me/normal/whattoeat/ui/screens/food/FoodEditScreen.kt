@@ -4,13 +4,16 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -48,6 +51,7 @@ import me.normal.whattoeat.data.local.entry.Food
 import me.normal.whattoeat.data.local.entry.FoodTable
 import me.normal.whattoeat.model.Cell
 import me.normal.whattoeat.ui.components.AppTopBar
+import me.normal.whattoeat.ui.components.CardText
 import me.normal.whattoeat.ui.components.CircleIconButton
 import me.normal.whattoeat.ui.components.PrimaryButton
 import me.normal.whattoeat.ui.components.RowItem
@@ -98,6 +102,7 @@ fun FoodEditContent(
     var isDeleteMode by remember { mutableStateOf(false) }
     var showCreateDialog by remember { mutableStateOf(false) }
     var newTableName by remember { mutableStateOf("") }
+    val tableName = tables.find{ table -> table.id == currentTableId }?.name ?: ""
 
     Scaffold(
         topBar = { AppTopBar(onReturnToEat, "编辑清单") }
@@ -108,14 +113,25 @@ fun FoodEditContent(
                 .padding(paddingValues),
             contentAlignment = Alignment.Center
         ) {
-            // 编辑表
-            Surface(
+
+            Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(start = 30.dp, end = 50.dp, top = 50.dp, bottom = 80.dp),
-                shape = RoundedCornerShape(12.dp)
-            ) {
+                    .padding(top = 30.dp, bottom = 2.dp),
+            ){
+                CardText(
+                    modifier = Modifier
+                        .padding(start = 35.dp)
+                        .height(36.dp),
+                    text = tableName,
+                    style = MaterialTheme.typography.titleMedium,
+                    textColor = MaterialTheme.colorScheme.primary
+                )
+                // 编辑表
                 EditTable(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(start = 30.dp, end = 50.dp),
                     foodList = foodList,
                     isDeleteMode = isDeleteMode,
                     onClickStar = onClickStar,
@@ -123,8 +139,22 @@ fun FoodEditContent(
                     onInputWeight = onInputWeight,
                     onClickDelRow = onClickDelRow,
                 )
-            }
 
+                Spacer(Modifier.height(25.dp))
+                // 底部按钮
+                Row(
+                    modifier = Modifier.padding(horizontal = 20.dp),
+                    horizontalArrangement = Arrangement.spacedBy(20.dp),
+                ){
+                    PrimaryButton("添加新菜品", Modifier.weight(2f).height(48.dp)) { onClickAddRow() }
+                    PrimaryButton(
+                        "编辑",
+                        Modifier.weight(1f).height(48.dp),
+                        MaterialTheme.colorScheme.surfaceVariant,
+                        MaterialTheme.colorScheme.primary)
+                    { isDeleteMode = !isDeleteMode }
+                }
+            }
 
             // 简略书签侧栏（右侧）
             EditBookmarkSidebar(
@@ -137,19 +167,6 @@ fun FoodEditContent(
                 modifier = Modifier.align(Alignment.CenterEnd)
             )
 
-            // 底部按钮
-            Row(
-                modifier = Modifier.align(Alignment.BottomCenter).padding(horizontal = 20.dp),
-                horizontalArrangement = Arrangement.spacedBy(20.dp)
-            ){
-                PrimaryButton("添加新菜品", Modifier.weight(2f).height(48.dp)) { onClickAddRow() }
-                PrimaryButton(
-                    "编辑",
-                    Modifier.weight(1f).height(48.dp),
-                    MaterialTheme.colorScheme.surfaceVariant,
-                    MaterialTheme.colorScheme.primary)
-                { isDeleteMode = !isDeleteMode }
-            }
         }
     }
 
@@ -193,6 +210,7 @@ fun FoodEditContent(
 
 @Composable
 private fun EditTable(
+    modifier: Modifier,
     foodList: List<Food>,
     isDeleteMode: Boolean,
     onClickStar: (food: Food) -> Unit,
@@ -213,7 +231,7 @@ private fun EditTable(
     )
 
     LazyColumn(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(5.dp)
     ) {

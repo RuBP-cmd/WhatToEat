@@ -14,7 +14,7 @@ interface FoodTableDao {
     fun getAll(): Flow<List<FoodTable>>
 
     @Insert
-    suspend fun insert(table: FoodTable)
+    suspend fun insert(table: FoodTable): Long
 
     @Update
     suspend fun update(table: FoodTable)
