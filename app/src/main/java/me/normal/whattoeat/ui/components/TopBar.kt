@@ -32,7 +32,7 @@ fun AppTopBar(
         horizontalArrangement = Arrangement.SpaceBetween, // 左边的放最左，右边的放最右，其余均分排布
         verticalAlignment = Alignment.CenterVertically
     ){
-        AppIconButton(onClickReturn){
+        IconButton(onClickReturn){
             Icon(
                 imageVector = Icons.Filled.ChevronLeft,
                 contentDescription = "返回",
@@ -55,7 +55,7 @@ fun AppTopBar(
                 enabled = false
             ) {}
         } else {
-            AppIconButton(onClickMore){
+            IconButton(onClickMore){
                 Icon(
                     imageVector = Icons.Filled.MoreVert,
                     contentDescription = "更多",

@@ -2,19 +2,25 @@ package me.normal.whattoeat.ui.components
 
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CardElevation
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -67,13 +73,42 @@ fun ElegantButton(
 }
 
 @Composable
-fun AppIconButton(
+fun PrimaryButton(
+    text: String,
+    modifier: Modifier = Modifier,
+    containerColor: Color = MaterialTheme.colorScheme.primary,
+    textColor: Color = Color.Unspecified,
+    onClick: () -> Unit
+){
+    Card(
+        modifier = modifier,
+        elevation = CardDefaults.elevatedCardElevation(),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor),
+        onClick = onClick
+    ){
+        BoxText(
+            modifier = Modifier.fillMaxSize(),
+            text = text,
+            style = MaterialTheme.typography.titleMedium,
+            textColor = textColor
+        )
+    }
+}
+
+@Composable
+fun CircleIconButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     content: (@Composable () -> Unit)
 ){
     IconButton(
-        modifier = modifier.defaultMinSize(48.dp, 48.dp),
+        modifier = modifier
+            .defaultMinSize(36.dp, 36.dp)
+            .background(
+                color = MaterialTheme.colorScheme.surface,
+                shape = CircleShape
+            ),
         onClick = onClick
     ){
         content()

@@ -1,5 +1,6 @@
 package me.normal.whattoeat.ui.screens.home
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Card
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -33,14 +35,12 @@ fun HomeScreen(
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(20.dp)
+        verticalArrangement = Arrangement.spacedBy(20.dp, Alignment.CenterVertically)
     ){
-        Spacer(modifier = Modifier.padding(30.dp))
         MobaMessageCard()
 
         Column(
             modifier = Modifier.width(IntrinsicSize.Max),
-//            verticalArrangement = Arrangement.spacedBy(10.dp)
         ){
             val modifier = Modifier.height(70.dp)
             CardButton(
@@ -76,13 +76,12 @@ private fun MobaMessageCard(){
             .height(80.dp)
     ){
         Box(
-            modifier = Modifier,
+            modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ){
             Text(
-                text = "点击Moba开始mobaQueen!",
-                modifier = Modifier.padding(10.dp),
-                fontSize = 28.sp,
+                text = "点击Moba开始\nmoba Queen!",
+                style = MaterialTheme.typography.titleLarge,
                 textAlign = TextAlign.Center
             )
         }

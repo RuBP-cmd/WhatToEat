@@ -32,9 +32,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import me.normal.whattoeat.data.local.entry.FoodTable
-import me.normal.whattoeat.ui.components.AppIconButton
 import me.normal.whattoeat.ui.components.AppTopBar
 import me.normal.whattoeat.ui.components.CardButton
+import me.normal.whattoeat.ui.components.CircleIconButton
 import me.normal.whattoeat.ui.viewmodel.FoodViewModel
 
 @Composable
@@ -172,15 +172,11 @@ private fun EatContent(
             )
 
             // 编辑按钮
-            AppIconButton(
+            CircleIconButton(
                 onClick = onNavigateToFoodEdit,
                 modifier = Modifier
                     .align(Alignment.TopEnd)
                     .offset(y = 150.dp)
-                    .background(
-                        color = MaterialTheme.colorScheme.surfaceContainer,
-                        shape = CircleShape
-                    )
             ) {
                 Icon(
                     imageVector = Icons.Filled.Edit,

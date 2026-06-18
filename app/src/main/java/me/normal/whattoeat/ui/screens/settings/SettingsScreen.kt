@@ -57,9 +57,9 @@ fun SettingsScreen(){
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .padding(top = 70.dp),
+            .padding(top = 40.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(30.dp)
+        verticalArrangement = Arrangement.spacedBy(30.dp, Alignment.Top)
     ){
 
         item {

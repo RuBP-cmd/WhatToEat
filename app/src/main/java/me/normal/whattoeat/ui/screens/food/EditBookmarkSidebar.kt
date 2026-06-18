@@ -6,6 +6,7 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -19,6 +20,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
@@ -36,7 +38,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import me.normal.whattoeat.data.local.entry.FoodTable
-import me.normal.whattoeat.ui.components.AppIconButton
 import kotlin.collections.forEach
 
 // --- 可编辑书签侧栏 ---
@@ -76,8 +77,8 @@ fun EditBookmarkSidebar(
             Box {
                 Surface(
                     modifier = Modifier
-                        .width(44.dp)
-                        .height(40.dp)
+                        .width(56.dp)
+                        .height(48.dp)
                         .clip(RoundedCornerShape(topStart = 6.dp, bottomStart = 6.dp))
                         .combinedClickable(
                             onClick = { onTableSelected(table.id) },
@@ -130,18 +131,18 @@ fun EditBookmarkSidebar(
         }
 
         // 新建表格按钮
-        AppIconButton(
+        IconButton(
             onClick = onAddTable,
             modifier = Modifier
-                .padding(end = 4.dp)
-                .size(28.dp)
+                .width(48.dp)
+                .height(48.dp)
                 .clip(RoundedCornerShape(topStart = 6.dp, bottomStart = 6.dp))
                 .background(MaterialTheme.colorScheme.surfaceVariant)
         ) {
             Icon(
                 imageVector = Icons.Filled.Add,
                 contentDescription = "新建表格",
-                modifier = Modifier.size(14.dp)
+                modifier = Modifier.size(24.dp)
             )
         }
     }
