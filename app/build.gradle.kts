@@ -50,6 +50,7 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.compose.foundation)
     implementation(libs.androidx.compose.material.icons.extended) // 图标库
     implementation(libs.androidx.navigation.compose) // 让指定页面才显示导航栏
     implementation(libs.androidx.datastore.preferences) // 读取配置文件

@@ -1,7 +1,9 @@
 package me.normal.whattoeat.ui.screens.food
 
+import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,14 +14,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -37,15 +37,21 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 import me.normal.whattoeat.R
 import me.normal.whattoeat.data.local.entry.Food
 import me.normal.whattoeat.data.local.entry.FoodTable
@@ -56,6 +62,7 @@ import me.normal.whattoeat.ui.components.CircleIconButton
 import me.normal.whattoeat.ui.components.PrimaryButton
 import me.normal.whattoeat.ui.components.RowItem
 import me.normal.whattoeat.ui.viewmodel.FoodViewModel
+import kotlin.math.roundToInt
 
 @Composable
 fun FoodEditScreen(
@@ -99,7 +106,6 @@ fun FoodEditContent(
     onInputName: (food: Food, name: String) -> Unit,
     onInputWeight: (food: Food, weight: Int) -> Unit
 ) {
-    var isDeleteMode by remember { mutableStateOf(false) }
     var showCreateDialog by remember { mutableStateOf(false) }
     var newTableName by remember { mutableStateOf("") }
     val tableName = tables.find{ table -> table.id == currentTableId }?.name ?: ""
@@ -121,10 +127,10 @@ fun FoodEditContent(
             ){
                 CardText(
                     modifier = Modifier
-                        .padding(start = 35.dp)
+                        .padding(horizontal = 35.dp)
                         .height(36.dp),
                     text = tableName,
-                    style = MaterialTheme.typography.titleMedium,
+                    style = MaterialTheme.typography.titleLarge,
                     textColor = MaterialTheme.colorScheme.primary
                 )
                 // 编辑表
@@ -133,7 +139,6 @@ fun FoodEditContent(
                         .weight(1f)
                         .padding(start = 30.dp, end = 50.dp),
                     foodList = foodList,
-                    isDeleteMode = isDeleteMode,
                     onClickStar = onClickStar,
                     onInputName = onInputName,
                     onInputWeight = onInputWeight,
@@ -148,11 +153,11 @@ fun FoodEditContent(
                 ){
                     PrimaryButton("添加新菜品", Modifier.weight(2f).height(48.dp)) { onClickAddRow() }
                     PrimaryButton(
-                        "编辑",
+                        "保存",
                         Modifier.weight(1f).height(48.dp),
                         MaterialTheme.colorScheme.surfaceVariant,
                         MaterialTheme.colorScheme.primary)
-                    { isDeleteMode = !isDeleteMode }
+                    {  }
                 }
             }
 
@@ -212,7 +217,6 @@ fun FoodEditContent(
 private fun EditTable(
     modifier: Modifier,
     foodList: List<Food>,
-    isDeleteMode: Boolean,
     onClickStar: (food: Food) -> Unit,
     onInputName: (food: Food, name: String) -> Unit,
     onInputWeight: (food: Food, weight: Int) -> Unit,
@@ -221,14 +225,7 @@ private fun EditTable(
     val weightList = listOf(2f, 8f, 3f)
     val titleColor = MaterialTheme.colorScheme.primary
     val titleStyle = MaterialTheme.typography.titleMedium
-    val textStyle = MaterialTheme.typography.bodyMedium
-    val horizontalPaddingValues = 5.dp
-    val textFieldColors = TextFieldDefaults.colors(
-        focusedContainerColor = Color.Transparent,
-        unfocusedContainerColor = Color.Transparent,
-        disabledContainerColor = Color.Transparent,
-        errorContainerColor = Color.Transparent,
-    )
+
 
     LazyColumn(
         modifier = modifier
@@ -239,7 +236,7 @@ private fun EditTable(
             RowItem(
                 modifier = Modifier
                     .background(MaterialTheme.colorScheme.surface)
-                    .padding(horizontal = horizontalPaddingValues),
+                    .padding(horizontal = 5.dp),
                 cells = listOf(
                     Cell({ Text(text = "参选", color = titleColor, style = titleStyle) }, weightList[0]),
                     Cell({ Text(text = "名称", color = titleColor, style = titleStyle) }, weightList[1]),
@@ -249,111 +246,177 @@ private fun EditTable(
         }
 
         items(foodList, key = { it.id }) { food ->
-            var isError by remember { mutableStateOf(false) }
-            var foodName by remember(food.id) { mutableStateOf(TextFieldValue(food.name)) }
-            var foodWeight by remember(food.id) { mutableStateOf(TextFieldValue(food.weight.toString())) }
+            SwipeRow(
+                modifier = Modifier.fillMaxWidth().height(70.dp),
+                food = food,
+                weightList = weightList,
+                onClickStar = onClickStar,
+                onInputName = onInputName,
+                onInputWeight = onInputWeight,
+                onDelete = { onClickDelRow(food) }
+            )
+        }
+    }
+}
 
+@Composable
+private fun SwipeRow(
+    modifier: Modifier,
+    food: Food,
+    weightList: List<Float>,
+    onClickStar: (food: Food) -> Unit,
+    onInputName: (food: Food, name: String) -> Unit,
+    onInputWeight: (food: Food, weight: Int) -> Unit,
+    onDelete: () -> Unit
+) {
+    val density = LocalDensity.current
+    val deleteBtnWidthPx = with(density) { 65.dp.toPx() }
 
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                elevation = CardDefaults.elevatedCardElevation(),
-                colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface)
-            ) {
-                RowItem(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(70.dp)
-                        .padding(horizontal = horizontalPaddingValues),
-                    cells = listOf(
-                        Cell( // 参选star
-                            content = {
-                                IconButton({ onClickStar(food) }) {
-                                    Image(
-                                        painter = painterResource(if (food.marked) R.drawable.filled_star else R.drawable.outlined_star),
-                                        contentDescription = "参选"
-                                    )
+    // 用 Animatable 驱动偏移量，drag 时 snap，松手后 animate
+    val offsetX = remember { Animatable(0f) }
+    var isOpen by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+
+    var isError by remember { mutableStateOf(false) }
+    var foodName by remember(food.id) { mutableStateOf(TextFieldValue(food.name)) }
+    var foodWeight by remember(food.id) { mutableStateOf(TextFieldValue(food.weight.toString())) }
+    val textFieldColors = TextFieldDefaults.colors(
+        focusedContainerColor = Color.Transparent,
+        unfocusedContainerColor = Color.Transparent,
+        disabledContainerColor = Color.Transparent,
+        errorContainerColor = Color.Transparent,
+    )
+
+    Box(modifier = modifier) {
+        // 背后的删除
+        CircleIconButton(
+            modifier = Modifier.align(Alignment.CenterEnd).padding(end = 10.dp),
+            backgroundColor = MaterialTheme.colorScheme.surfaceVariant,
+            onClick = onDelete
+        ){
+            Icon(
+                imageVector = (Icons.Filled.Delete),
+                contentDescription = "删除此行数据"
+            )
+        }
+
+        // 前面的卡片
+        Card(
+            modifier = Modifier
+                .fillMaxSize()
+                .offset { IntOffset(offsetX.value.roundToInt(), 0) }
+                .pointerInput(Unit) {
+                    detectHorizontalDragGestures(
+                        onDragStart = { },
+                        onDragEnd = {
+                            scope.launch {
+                                if (isOpen) {
+                                    offsetX.animateTo(-deleteBtnWidthPx)
+                                } else {
+                                    offsetX.animateTo(0f)
                                 }
-                            },
-                            weight = weightList[0]
-                        ),
-                        Cell( // 名称name输入
-                            content = {
-                                Surface(
-                                    color = MaterialTheme.colorScheme.surfaceContainer,
-                                    shape = RoundedCornerShape(4.dp)
-                                ){
-                                    OutlinedTextField(
-                                        value = foodName,
-                                        textStyle = textStyle,
-                                        colors = textFieldColors,
-                                        placeholder = { Text(text = "请输入名称", color = MaterialTheme.colorScheme.onSurfaceVariant) },
-                                        onValueChange = { newFoodName ->
-                                            foodName = newFoodName
-                                            onInputName(food, newFoodName.text)
+                            }
+                        },
+                        onDragCancel = {
+                            scope.launch {
+                                offsetX.animateTo(if (isOpen) -deleteBtnWidthPx else 0f)
+                            }
+                        },
+                        onHorizontalDrag = { _, dragAmount ->
+                            scope.launch {
+                                val newValue = (offsetX.value + dragAmount)
+                                    .coerceIn(-deleteBtnWidthPx, 0f)
+                                offsetX.snapTo(newValue)
+                                // 拖过一半就算 Open
+                                isOpen = newValue < -deleteBtnWidthPx / 2
+                            }
+                        }
+                    )
+                },
+            elevation = CardDefaults.elevatedCardElevation(),
+            colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface)
+        ) {
+            RowItem(
+                modifier = Modifier.fillMaxSize(),
+                cells = listOf(
+                    Cell( // 参选Star
+                        content = {
+                            IconButton({ onClickStar(food) }) {
+                                Image(
+                                    painter = painterResource(
+                                        if (food.marked) R.drawable.filled_star
+                                        else R.drawable.outlined_star
+                                    ),
+                                    contentDescription = "参选"
+                                )
+                            }
+                        },
+                        weight = weightList[0]
+                    ),
+                    Cell( // 食物名称
+                        content = {
+                            Surface(
+                                color = MaterialTheme.colorScheme.surfaceContainer,
+                                shape = RoundedCornerShape(4.dp)
+                            ) {
+                                OutlinedTextField(
+                                    value = foodName,
+                                    textStyle = MaterialTheme.typography.bodyMedium,
+                                    colors = textFieldColors,
+                                    placeholder = {
+                                        Text(
+                                            text = "请输入名称",
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    },
+                                    onValueChange = { newFoodName ->
+                                        foodName = newFoodName
+                                        onInputName(food, newFoodName.text)
+                                    }
+                                )
+                            }
+                        },
+                        weight = weightList[1]
+                    ),
+                    Cell( // 权重
+                        content = {
+                            Surface(
+                                color = MaterialTheme.colorScheme.surfaceContainer,
+                                shape = RoundedCornerShape(6.dp)
+                            ) {
+                                OutlinedTextField(
+                                    value = foodWeight,
+                                    textStyle = MaterialTheme.typography.bodyMedium,
+                                    colors = textFieldColors,
+                                    onValueChange = { newFoodWeight ->
+                                        foodWeight = newFoodWeight
+                                        val text = newFoodWeight.text
+                                        if (text.isNotEmpty() && text.length <= 5 && text.all { it.isDigit() }) {
+                                            onInputWeight(food, text.toInt())
+                                            isError = false
+                                        } else {
+                                            isError = text.isNotEmpty()
                                         }
-                                    )
-                                }
-
-                            },
-                            weight = weightList[1]
-                        ),
-                        Cell( // 权重weight输入
-                            content = {
-                                Surface(
-                                    color = MaterialTheme.colorScheme.surfaceContainer,
-                                    shape = RoundedCornerShape(6.dp)
-                                ){
-                                    OutlinedTextField(
-                                        value = foodWeight,
-                                        textStyle = textStyle,
-                                        colors = textFieldColors,
-                                        onValueChange = { newFoodWeight ->
-                                            foodWeight = newFoodWeight
-                                            val text = newFoodWeight.text
-                                            if (text.isNotEmpty() && text.length <= 5 && text.all { it.isDigit() }) {
-                                                onInputWeight(food, text.toInt())
-                                                isError = false
-                                            } else {
-                                                isError = text.isNotEmpty()
-                                            }
-                                        },
-                                        isError = isError,
-                                        supportingText = if (isError) {
-                                            { Text("请输入有效数字", color = MaterialTheme.colorScheme.error) }
-                                        } else null,
-                                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                    )
-                                }
-
-                            },
-                            weight = weightList[2]
-                        )
+                                    },
+                                    isError = isError,
+                                    supportingText = if (isError) {
+                                        { Text("请输入有效数字", color = MaterialTheme.colorScheme.error) }
+                                    } else null,
+                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                )
+                            }
+                        },
+                        weight = weightList[2]
                     )
                 )
-
-                if (isDeleteMode) {
-                    CircleIconButton(
-                        { onClickDelRow(food) },
-                        modifier = Modifier
-                            .size(20.dp)
-                            .align(Alignment.End)
-                            .offset(x = (-2).dp, y = 2.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.Close,
-                            contentDescription = "删除行"
-                        )
-                    }
-                }
-
-            }
+            )
         }
     }
 }
 
 @Preview
 @Composable
-fun FoodEditContentPreview() {
+private fun FoodEditContentPreview() {
     FoodEditContent(
         foodList = emptyList(),
         tables = listOf(

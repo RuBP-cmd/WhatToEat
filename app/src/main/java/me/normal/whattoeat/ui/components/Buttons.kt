@@ -100,13 +100,14 @@ fun PrimaryButton(
 fun CircleIconButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    backgroundColor: Color = MaterialTheme.colorScheme.surface,
     content: (@Composable () -> Unit)
 ){
     IconButton(
         modifier = modifier
             .defaultMinSize(36.dp, 36.dp)
             .background(
-                color = MaterialTheme.colorScheme.surface,
+                color = backgroundColor,
                 shape = CircleShape
             ),
         onClick = onClick
