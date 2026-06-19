@@ -150,7 +150,7 @@ fun FoodEditContent(
                 EditTable(
                     modifier = Modifier
                         .weight(1f)
-                        .padding(start = 30.dp, end = 50.dp),
+                        .padding(horizontal = 30.dp),
                     foodList = foodList,
                     onClickStar = onClickStar,
                     onInputName = onInputName,
@@ -354,6 +354,8 @@ private fun EditTable(
         stickyHeader {
             RowItem(
                 modifier = Modifier
+                    .fillMaxWidth()
+                    .height(36.dp)
                     .background(MaterialTheme.colorScheme.surface)
                     .padding(horizontal = 5.dp)
                     .combinedClickable(
@@ -373,6 +375,7 @@ private fun EditTable(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(70.dp)
+                    .padding(horizontal = 2.dp)
                     .animateItem(),
                 food = food,
                 weightList = weightList,

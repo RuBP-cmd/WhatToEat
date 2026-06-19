@@ -142,7 +142,9 @@ class FoodViewModel(
     }
 
     fun ignoreChosenFood() {
-        update(chosenFood!!.copy(marked = false))
+        chosenFood?.let {
+            update(it.copy(marked = false))
+        }
     }
 
     fun clearAllIgnore() {

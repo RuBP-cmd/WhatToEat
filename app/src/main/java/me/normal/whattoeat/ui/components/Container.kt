@@ -55,7 +55,7 @@ fun RowItem(
     cells :List<Cell>
 ){
     Row(
-        modifier = modifier.fillMaxWidth().padding(vertical = 10.dp, horizontal = 5.dp),
+        modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(5.dp)
     ){
