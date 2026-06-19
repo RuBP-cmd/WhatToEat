@@ -58,6 +58,7 @@ import me.normal.whattoeat.ui.components.AppTopBar
 import me.normal.whattoeat.ui.components.CardText
 import me.normal.whattoeat.ui.components.CardTextFiled
 import me.normal.whattoeat.ui.components.CircleIconButton
+import me.normal.whattoeat.ui.components.ConfirmDialog
 import me.normal.whattoeat.ui.components.LeftSwipeBox
 import me.normal.whattoeat.ui.components.PrimaryButton
 import me.normal.whattoeat.ui.components.RowItem
@@ -81,8 +82,8 @@ fun FoodEditScreen(
         onRenameTable = { tableId, name -> foodViewModel.renameTable(tableId, name) },
         onDeleteTable = { tableId -> foodViewModel.deleteTable(tableId) },
         onCreateTable = { name -> foodViewModel.createTable(name) },
-        onClickAddRow = { foodViewModel.insert(Food(name = "", weight = 1, marked = true)) },
-        onClickDelRow = { food -> foodViewModel.delete(food) },
+        onAddFood = { foodViewModel.insert(Food(name = "", weight = 1, marked = true)) },
+        onDelFood = { food -> foodViewModel.delete(food) },
         onClickStar = { food -> foodViewModel.update(food.copy(marked = !food.marked)) },
         onInputName = { food, name -> foodViewModel.update(food.copy(name = name)) },
         onInputWeight = { food, weight -> foodViewModel.update(food.copy(weight = weight)) }
@@ -99,16 +100,18 @@ fun FoodEditContent(
     onRenameTable: (Int, String) -> Unit,
     onDeleteTable: (Int) -> Unit,
     onCreateTable: (String) -> Unit,
-    onClickAddRow: () -> Unit,
-    onClickDelRow: (food: Food) -> Unit,
+    onAddFood: () -> Unit,
+    onDelFood: (food: Food) -> Unit,
     onClickStar: (food: Food) -> Unit,
     onInputName: (food: Food, name: String) -> Unit,
     onInputWeight: (food: Food, weight: Int) -> Unit
 ) {
     var showCreateDialog by remember { mutableStateOf(false) }
-    var showDeleteDialog by remember { mutableStateOf(false) }
+    var showDeleteTableDialog by remember { mutableStateOf(false) }
+    var showDeleteFoodDialog by remember { mutableStateOf(false) }
     var newTableName by remember { mutableStateOf("") }
     val tableName = tables.find{ table -> table.id == currentTableId }?.name ?: ""
+    var foodPendingDelete by remember { mutableStateOf<Food?>(null) }
 
     Scaffold(
         topBar = { AppTopBar(onReturnToEat, "编辑清单") }
@@ -155,8 +158,8 @@ fun FoodEditContent(
                     onClickStar = onClickStar,
                     onInputName = onInputName,
                     onInputWeight = onInputWeight,
-                    onClickDelRow = onClickDelRow,
-                    onDelete = { showDeleteDialog = true } // 拉出删除对话框
+                    onClickDelFood = { foodPendingDelete = it; showDeleteFoodDialog = true },
+                    onDelete = { showDeleteTableDialog = true } // 拉出删除对话框
                 )
 
                 Spacer(Modifier.height(25.dp))
@@ -167,7 +170,7 @@ fun FoodEditContent(
                 ){
                     PrimaryButton("添加新菜品", Modifier
                         .weight(2f)
-                        .height(48.dp)) { onClickAddRow() }
+                        .height(48.dp)) { onAddFood() }
                     PrimaryButton(
                         "保存",
                         Modifier
@@ -217,25 +220,31 @@ fun FoodEditContent(
         )
     }
 
-    if(showDeleteDialog) {
-        AlertDialog(
-            onDismissRequest = {
-                showDeleteDialog = false
+    if(showDeleteTableDialog) {
+        ConfirmDialog(
+            title = "删除表格",
+            message = "确认删除？",
+            onConfirm = {
+                onDeleteTable(currentTableId)
+                showDeleteTableDialog = false
             },
-            title = { Text("删除表格")},
-            text = { Text("确认删除？")},
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        onDeleteTable(currentTableId)
-                        showDeleteDialog = false
-                    }
-                ){ Text("确定") }
+            onDismiss = {
+                showDeleteTableDialog = false
+            }
+        )
+    }
+    if(showDeleteFoodDialog) {
+        ConfirmDialog(
+            title = "删除菜品",
+            message = "确认删除？",
+            onConfirm = {
+                foodPendingDelete?.let{
+                    onDelFood(it)
+                }
+                showDeleteFoodDialog = false
             },
-            dismissButton = {
-                TextButton(
-                    onClick = { showDeleteDialog = false }
-                ) { Text(text = "取消", color = MaterialTheme.colorScheme.onSurface) }
+            onDismiss = {
+                showDeleteFoodDialog = false
             }
         )
     }
@@ -338,7 +347,7 @@ private fun EditTable(
     onClickStar: (food: Food) -> Unit,
     onInputName: (food: Food, name: String) -> Unit,
     onInputWeight: (food: Food, weight: Int) -> Unit,
-    onClickDelRow: (food: Food) -> Unit,
+    onClickDelFood: (food: Food) -> Unit,
     onDelete: () -> Unit
 ) {
     val weightList = listOf(2f, 8f, 3f)
@@ -382,7 +391,7 @@ private fun EditTable(
                 onClickStar = onClickStar,
                 onInputName = onInputName,
                 onInputWeight = onInputWeight,
-                onDelete = { onClickDelRow(food) }
+                onDelete = { onClickDelFood(food) }
             )
         }
     }
@@ -525,8 +534,8 @@ private fun FoodEditContentPreview() {
         onRenameTable = { _, _ -> },
         onDeleteTable = {},
         onCreateTable = {},
-        onClickAddRow = {},
-        onClickDelRow = {},
+        onAddFood = {},
+        onDelFood = {},
         onClickStar = { },
         onInputName = { _, _ -> },
         onInputWeight = { _, _ -> },
