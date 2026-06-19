@@ -22,13 +22,19 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import me.normal.whattoeat.ui.components.CardButton
-
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 
 @Composable
 fun HomeScreen(
     onNavigateToEat: () -> Unit,
     onNavigateToPracticalWebsite: () -> Unit,
-    onNavigateToOther: () -> Unit
+    onNavigateToOther: () -> Unit,
+    onNavigateToCalendar: () -> Unit
 ){
     val uriHandler = LocalUriHandler.current
 
@@ -37,10 +43,24 @@ fun HomeScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(20.dp, Alignment.CenterVertically)
     ){
+
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End
+        ) {
+            IconButton(onClick = { onNavigateToCalendar() }) {
+                Icon(Icons.Default.DateRange, contentDescription = "日历")
+            }
+        }
+
+        Spacer(modifier = Modifier.padding(30.dp))
+
         MobaMessageCard()
 
         Column(
             modifier = Modifier.width(IntrinsicSize.Max),
+           verticalArrangement = Arrangement.spacedBy(10.dp)
         ){
             val modifier = Modifier.height(70.dp)
             CardButton(
@@ -92,6 +112,7 @@ private fun MobaMessageCard(){
 @Composable
 private fun HomeScreenPreview(){
     HomeScreen(
+        {},
         {},
         {},
         {}
