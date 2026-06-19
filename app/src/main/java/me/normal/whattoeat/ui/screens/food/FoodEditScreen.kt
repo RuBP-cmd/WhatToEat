@@ -1,24 +1,26 @@
 package me.normal.whattoeat.ui.screens.food
 
-import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
@@ -27,8 +29,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.PrimaryScrollableTabRow
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
@@ -37,32 +41,27 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.launch
 import me.normal.whattoeat.R
 import me.normal.whattoeat.data.local.entry.Food
 import me.normal.whattoeat.data.local.entry.FoodTable
 import me.normal.whattoeat.model.Cell
 import me.normal.whattoeat.ui.components.AppTopBar
 import me.normal.whattoeat.ui.components.CardText
+import me.normal.whattoeat.ui.components.CardTextFiled
 import me.normal.whattoeat.ui.components.CircleIconButton
+import me.normal.whattoeat.ui.components.LeftSwipeBox
 import me.normal.whattoeat.ui.components.PrimaryButton
 import me.normal.whattoeat.ui.components.RowItem
 import me.normal.whattoeat.ui.viewmodel.FoodViewModel
-import kotlin.math.roundToInt
 
 @Composable
 fun FoodEditScreen(
@@ -107,6 +106,7 @@ fun FoodEditContent(
     onInputWeight: (food: Food, weight: Int) -> Unit
 ) {
     var showCreateDialog by remember { mutableStateOf(false) }
+    var showDeleteDialog by remember { mutableStateOf(false) }
     var newTableName by remember { mutableStateOf("") }
     val tableName = tables.find{ table -> table.id == currentTableId }?.name ?: ""
 
@@ -123,16 +123,29 @@ fun FoodEditContent(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(top = 30.dp, bottom = 2.dp),
+                    .padding(top = 5.dp, bottom = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(2.dp)
             ){
-                CardText(
+                // 标题
+                RenameableTitle(
                     modifier = Modifier
                         .padding(horizontal = 35.dp)
-                        .height(36.dp),
-                    text = tableName,
-                    style = MaterialTheme.typography.titleLarge,
-                    textColor = MaterialTheme.colorScheme.primary
+                        .height(70.dp),
+                    tableName = tableName,
+                    onRenaming = { name -> onRenameTable(currentTableId, name) } // 重命名
                 )
+
+                // 滚动标题栏（切换表格）
+                ScrollableTableTitleRow(
+                    modifier = Modifier
+                        .padding(horizontal = 30.dp)
+                        .fillMaxWidth(),
+                    currentTableId = currentTableId,
+                    tables = tables,
+                    onTableSelected = onTableSelected,
+                    onAddTable = { showCreateDialog = true } // 拉出创建对话框
+                )
+                
                 // 编辑表
                 EditTable(
                     modifier = Modifier
@@ -143,6 +156,7 @@ fun FoodEditContent(
                     onInputName = onInputName,
                     onInputWeight = onInputWeight,
                     onClickDelRow = onClickDelRow,
+                    onDelete = { showDeleteDialog = true } // 拉出删除对话框
                 )
 
                 Spacer(Modifier.height(25.dp))
@@ -151,26 +165,19 @@ fun FoodEditContent(
                     modifier = Modifier.padding(horizontal = 20.dp),
                     horizontalArrangement = Arrangement.spacedBy(20.dp),
                 ){
-                    PrimaryButton("添加新菜品", Modifier.weight(2f).height(48.dp)) { onClickAddRow() }
+                    PrimaryButton("添加新菜品", Modifier
+                        .weight(2f)
+                        .height(48.dp)) { onClickAddRow() }
                     PrimaryButton(
                         "保存",
-                        Modifier.weight(1f).height(48.dp),
+                        Modifier
+                            .weight(1f)
+                            .height(48.dp),
                         MaterialTheme.colorScheme.surfaceVariant,
                         MaterialTheme.colorScheme.primary)
                     {  }
                 }
             }
-
-            // 简略书签侧栏（右侧）
-            EditBookmarkSidebar(
-                tables = tables,
-                currentTableId = currentTableId,
-                onTableSelected = onTableSelected,
-                onRenameTable = onRenameTable,
-                onDeleteTable = onDeleteTable,
-                onAddTable = { showCreateDialog = true },
-                modifier = Modifier.align(Alignment.CenterEnd)
-            )
 
         }
     }
@@ -209,9 +216,120 @@ fun FoodEditContent(
             }
         )
     }
+
+    if(showDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                showDeleteDialog = false
+            },
+            title = { Text("删除表格")},
+            text = { Text("确认删除？")},
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        onDeleteTable(currentTableId)
+                        showDeleteDialog = false
+                    }
+                ){ Text("确定") }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { showDeleteDialog = false }
+                ) { Text(text = "取消", color = MaterialTheme.colorScheme.onSurface) }
+            }
+        )
+    }
 }
 
+@Composable
+private fun RenameableTitle(
+    modifier: Modifier,
+    tableName: String,
+    onRenaming: (String) -> Unit,
+){
+    var isRenaming by remember { mutableStateOf(false) }
 
+    if(!isRenaming){
+        CardText(
+            modifier = modifier
+                .combinedClickable(
+                    onDoubleClick = { isRenaming = true },
+                    onClick = {}
+                ),
+            text = tableName,
+            style = MaterialTheme.typography.titleLarge,
+            textColor = MaterialTheme.colorScheme.primary
+        )
+    } else {
+        Row(
+            modifier = modifier,
+            horizontalArrangement = Arrangement.spacedBy(5.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ){
+            CardTextFiled(
+                modifier = Modifier.weight(1f).fillMaxHeight(),
+                text = tableName,
+                onValueChange = onRenaming,
+            )
+            PrimaryButton(
+                modifier = Modifier
+                    .width(IntrinsicSize.Min)
+                    .height(IntrinsicSize.Min),
+                text = "确定"
+            ) {
+                isRenaming = false
+            }
+        }
+
+
+    }
+}
+@Composable
+private fun ScrollableTableTitleRow(
+    modifier: Modifier,
+    currentTableId: Int, // 更新的根源
+    tables: List<FoodTable>,
+    onTableSelected: (Int) -> Unit,
+    onAddTable: () -> Unit,
+){
+    val selectedIndex = remember(currentTableId, tables) {
+        tables.indexOfFirst{ it.id == currentTableId }
+    }
+    PrimaryScrollableTabRow(
+        modifier = modifier,
+        selectedTabIndex = selectedIndex
+    ) {
+        tables.forEachIndexed { index, table ->
+            Tab(
+                selected = index == selectedIndex,
+                onClick = { onTableSelected(table.id) },
+                text = {
+                    Text(
+                        text = table.name,
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                }
+            )
+        }
+
+        Tab(
+            selected = false,
+            onClick = onAddTable,
+            text = {
+                Text(
+                    text = "添加表格",
+                    style = MaterialTheme.typography.titleSmall
+                )
+            },
+            icon = {
+                Icon(
+                    imageVector = Icons.Filled.Add,
+                    contentDescription = "添加表格"
+                )
+            }
+        )
+    }
+}
 
 @Composable
 private fun EditTable(
@@ -220,7 +338,8 @@ private fun EditTable(
     onClickStar: (food: Food) -> Unit,
     onInputName: (food: Food, name: String) -> Unit,
     onInputWeight: (food: Food, weight: Int) -> Unit,
-    onClickDelRow: (food: Food) -> Unit
+    onClickDelRow: (food: Food) -> Unit,
+    onDelete: () -> Unit
 ) {
     val weightList = listOf(2f, 8f, 3f)
     val titleColor = MaterialTheme.colorScheme.primary
@@ -236,7 +355,11 @@ private fun EditTable(
             RowItem(
                 modifier = Modifier
                     .background(MaterialTheme.colorScheme.surface)
-                    .padding(horizontal = 5.dp),
+                    .padding(horizontal = 5.dp)
+                    .combinedClickable(
+                        onLongClick = onDelete,
+                        onClick = {}
+                    ),
                 cells = listOf(
                     Cell({ Text(text = "参选", color = titleColor, style = titleStyle) }, weightList[0]),
                     Cell({ Text(text = "名称", color = titleColor, style = titleStyle) }, weightList[1]),
@@ -247,7 +370,10 @@ private fun EditTable(
 
         items(foodList, key = { it.id }) { food ->
             SwipeRow(
-                modifier = Modifier.fillMaxWidth().height(70.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(70.dp)
+                    .animateItem(),
                 food = food,
                 weightList = weightList,
                 onClickStar = onClickStar,
@@ -269,14 +395,6 @@ private fun SwipeRow(
     onInputWeight: (food: Food, weight: Int) -> Unit,
     onDelete: () -> Unit
 ) {
-    val density = LocalDensity.current
-    val deleteBtnWidthPx = with(density) { 65.dp.toPx() }
-
-    // 用 Animatable 驱动偏移量，drag 时 snap，松手后 animate
-    val offsetX = remember { Animatable(0f) }
-    var isOpen by remember { mutableStateOf(false) }
-    val scope = rememberCoroutineScope()
-
     var isError by remember { mutableStateOf(false) }
     var foodName by remember(food.id) { mutableStateOf(TextFieldValue(food.name)) }
     var foodWeight by remember(food.id) { mutableStateOf(TextFieldValue(food.weight.toString())) }
@@ -287,55 +405,29 @@ private fun SwipeRow(
         errorContainerColor = Color.Transparent,
     )
 
-    Box(modifier = modifier) {
-        // 背后的删除
-        CircleIconButton(
-            modifier = Modifier.align(Alignment.CenterEnd).padding(end = 10.dp),
-            backgroundColor = MaterialTheme.colorScheme.surfaceVariant,
-            onClick = onDelete
-        ){
-            Icon(
-                imageVector = (Icons.Filled.Delete),
-                contentDescription = "删除此行数据"
-            )
+    LeftSwipeBox(
+        menuWidthDp = 60.dp,
+        modifier = modifier,
+        menuContent = {
+            CircleIconButton(
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .padding(end = 5.dp),
+                backgroundColor = MaterialTheme.colorScheme.surfaceVariant,
+                onClick = onDelete
+            ) {
+                Icon(
+                    imageVector = (Icons.Filled.Delete),
+                    contentDescription = "删除此行数据"
+                )
+            }
         }
-
-        // 前面的卡片
+    ) {
         Card(
-            modifier = Modifier
-                .fillMaxSize()
-                .offset { IntOffset(offsetX.value.roundToInt(), 0) }
-                .pointerInput(Unit) {
-                    detectHorizontalDragGestures(
-                        onDragStart = { },
-                        onDragEnd = {
-                            scope.launch {
-                                if (isOpen) {
-                                    offsetX.animateTo(-deleteBtnWidthPx)
-                                } else {
-                                    offsetX.animateTo(0f)
-                                }
-                            }
-                        },
-                        onDragCancel = {
-                            scope.launch {
-                                offsetX.animateTo(if (isOpen) -deleteBtnWidthPx else 0f)
-                            }
-                        },
-                        onHorizontalDrag = { _, dragAmount ->
-                            scope.launch {
-                                val newValue = (offsetX.value + dragAmount)
-                                    .coerceIn(-deleteBtnWidthPx, 0f)
-                                offsetX.snapTo(newValue)
-                                // 拖过一半就算 Open
-                                isOpen = newValue < -deleteBtnWidthPx / 2
-                            }
-                        }
-                    )
-                },
+            modifier = Modifier.fillMaxSize(),
             elevation = CardDefaults.elevatedCardElevation(),
-            colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface)
-        ) {
+            colors = CardDefaults.cardColors(MaterialTheme.colorScheme.surface),
+        ){
             RowItem(
                 modifier = Modifier.fillMaxSize(),
                 cells = listOf(
@@ -411,6 +503,7 @@ private fun SwipeRow(
                 )
             )
         }
+
     }
 }
 
