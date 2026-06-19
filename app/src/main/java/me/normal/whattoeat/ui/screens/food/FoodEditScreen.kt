@@ -424,7 +424,7 @@ private fun SwipeRow(
             CircleIconButton(
                 modifier = Modifier
                     .align(Alignment.Center)
-                    .padding(end = 5.dp),
+                    .padding(end = 3.dp),
                 backgroundColor = MaterialTheme.colorScheme.surfaceVariant,
                 onClick = onDelete
             ) {
