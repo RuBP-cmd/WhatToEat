@@ -16,6 +16,7 @@ import me.normal.whattoeat.data.local.entry.FoodTable
 import me.normal.whattoeat.data.repository.FoodRepository
 import me.normal.whattoeat.data.repository.FoodTableRepository
 import me.normal.whattoeat.data.repository.SettingsRepository
+import me.normal.whattoeat.domain.selectFood
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class FoodViewModel(
@@ -118,27 +119,8 @@ class FoodViewModel(
             food.marked && food.weight > 0 && food.name.isNotEmpty()
         }
 
-        if (foodList.isEmpty()) return "列表为空！"
-
-        val candidates = if (foodList.size == 1) {
-            foodList
-        } else {
-            foodList.filter { food -> food != chosenFood }
-        }
-
-        val totalWeight = candidates.sumOf { food -> food.weight }
-        val random = Math.random()
-        var sumWeight = 0
-
-        for (food in candidates) {
-            sumWeight += food.weight
-            if (sumWeight.toDouble() / totalWeight >= random) {
-                chosenFood = food
-                return chosenFood!!.name // 一定非null
-            }
-        }
-        chosenFood = candidates.last()
-        return chosenFood!!.name
+        chosenFood = selectFood(foodList, chosenFood)
+        return chosenFood?.name ?: "没有可供选择的食物！"
     }
 
     fun ignoreChosenFood() {
